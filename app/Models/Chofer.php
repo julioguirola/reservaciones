@@ -13,7 +13,6 @@ class Chofer extends Model
   protected $table = 'chofer';
   public string $licencia_numero;
   public $timestamps = false;
-  protected $primaryKey = 'persona_id';
   /**
    * @return BelongsTo<Persona,Chofer>
    */
@@ -26,6 +25,6 @@ class Chofer extends Model
    */
   public function viajes(): HasMany
   {
-    return $this->hasMany(Viaje::class, 'chofer_id', 'persona_id');
+    return $this->hasMany(Viaje::class);
   }
 }

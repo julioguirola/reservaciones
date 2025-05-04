@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ViajesController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -10,7 +11,7 @@ Route::get('/', function () {
   ->name('home');
 
 Route::get('viajes', function () {
-  return Inertia::render('Viajes');
+  return Inertia::render('Viajes', ['viajes' => ViajesController::getViajes()]);
 })
   ->middleware(['auth', 'verified'])
   ->name('viajes');

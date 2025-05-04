@@ -14,6 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 <template>
     <Head title="Viajes" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">a</div>
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">{{ $page.props.viajes }}</div>
     </AppLayout>
 </template>

@@ -17,9 +17,9 @@ class ViajesController extends Controller
     return ['viaje' => $viaje, 'profesor' => $profesor];
   }
 
-  public function getViajes()
+  public static function getViajes()
   {
-    return Viaje::all();
+    return Viaje::select('viaje.id', 'viaje.fecha', 'persona.nombre')->join('persona', 'persona.id', '=', 'viaje.chofer_id')->get()->all();
   }
 
   public function getProfesoresViaje(string $id)

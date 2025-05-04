@@ -178,7 +178,9 @@ class DatabaseSeeder extends Seeder
       ->create();
 
     Chofer::all()->each(function ($chofer) {
-      Viaje::factory()->create(['chofer_id' => $chofer->persona_id]);
+      Viaje::factory()
+        ->count(rand(1, 5))
+        ->create(['chofer_id' => $chofer->persona_id]);
     });
 
     $viajes = Viaje::all();

@@ -20,7 +20,7 @@ class Viaje extends Model
    */
   public function chofer(): BelongsTo
   {
-    return $this->belongsTo(Chofer::class, 'chofer_id', 'persona_id');
+    return $this->belongsTo(Chofer::class);
   }
   /**
    * @return HasMany<Profesor,Viaje>
