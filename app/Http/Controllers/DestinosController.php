@@ -22,8 +22,8 @@ class DestinosController extends Controller
     return Profesor::select('destino.nombre as destino')
       ->distinct('destino')
       ->join('destino', 'profesor.destino_id', '=', 'destino.id')
-      ->join('viaje_profesor', 'viaje_profesor.profesor_id', '=', 'profesor.persona_id')
-      ->where('viaje_profesor.viaje_id', $viaje_id)
+      ->join('profesor_viaje', 'profesor_viaje.profesor_id', '=', 'profesor.id')
+      ->where('profesor_viaje.viaje_id', $viaje_id)
       ->limit(4)
       ->get();
   }

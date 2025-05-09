@@ -17,6 +17,6 @@ class ChoferesController extends Controller
 
   public static function renderChoferes()
   {
-    return Inertia::render('Choferes', ['choferes' => ChoferesController::getChoferes()]);
+    return Inertia::render('Choferes', ['choferes' => $this->getChoferes()]);
   }
 }

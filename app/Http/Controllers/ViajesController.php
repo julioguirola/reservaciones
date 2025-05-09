@@ -21,7 +21,8 @@ class ViajesController extends Controller
   public static function getViajes()
   {
     return Viaje::select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
-      ->join('persona', 'persona.id', '=', 'viaje.chofer_id')
+      ->join('chofer', 'chofer.id', '=', 'viaje.chofer_id')
+      ->join('persona', 'persona.id', '=', 'chofer.persona_id')
       ->get()
       ->all();
   }

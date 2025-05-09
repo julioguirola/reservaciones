@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperPersona
+ */
 class Persona extends Model
 {
   use HasFactory, HasUuids;

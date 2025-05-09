@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\AppController;
+use App\Http\Controllers\RenderController;
 use App\Http\Controllers\ChoferesController;
 use App\Http\Controllers\DestinosController;
 use App\Http\Controllers\ProfesoresController;
 use App\Http\Controllers\ViajesController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AppController::class, 'renderWelcome'])
+Route::get('/', [RenderController::class, 'renderWelcome'])
   ->middleware(['auth', 'verified'])
   ->name('home');
 
@@ -15,7 +15,7 @@ Route::get('viajes', [ViajesController::class, 'renderViajes'])
   ->middleware(['auth', 'verified'])
   ->name('viajes');
 
-Route::get('dashboard', [AppController::class, 'renderDashboard'])
+Route::get('dashboard', [RenderController::class, 'renderDashboard'])
   ->middleware(['auth', 'verified'])
   ->name('dashboard');
 

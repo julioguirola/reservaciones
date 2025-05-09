@@ -10,7 +10,7 @@ class ProfesoresController extends Controller
 {
   public static function countProfesoresViajes(string $viaje_id): int
   {
-    return DB::table('viaje_profesor')->where('viaje_id', $viaje_id)->count();
+    return DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
   }
 
   public static function getProfesores()

@@ -20,7 +20,7 @@ class AuthenticatedSessionController extends Controller
   {
     return Inertia::render('auth/Login', [
       'canResetPassword' => Route::has('password.request'),
-      'status' => $request->session()->get('status'),
+      'status' => session()->get('status'),
     ]);
   }
 
@@ -31,7 +31,7 @@ class AuthenticatedSessionController extends Controller
   {
     $request->authenticate();
 
-    $request->session()->regenerate();
+    session()->regenerate();
 
     return redirect()->intended(route('viajes', absolute: false));
   }
@@ -43,8 +43,8 @@ class AuthenticatedSessionController extends Controller
   {
     Auth::guard('web')->logout();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+    session()->invalidate();
+    session()->regenerateToken();
 
     return redirect('/');
   }
