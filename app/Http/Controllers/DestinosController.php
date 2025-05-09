@@ -3,33 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Destino;
-use App\Models\Profesor;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DestinosController extends Controller
 {
-  public function editTarifa(Request $req)
+  /**
+   * @return Collection<int,Destino>
+   */
+  public static function getDestinos(): Collection
   {
-    $destino = Destino::find($req->id);
-    $destino->precio = $req->precio;
-    $destino->save();
-    return $destino;
+    return Destino::all();
   }
-
-  public static function getDestinosViaje($viaje_id)
+  /**
+   * @return Response
+   */
+  public static function renderDestinos(): Response
   {
-    return Profesor::select('destino.nombre as destino')
-      ->distinct('destino')
-      ->join('destino', 'profesor.destino_id', '=', 'destino.id')
-      ->join('profesor_viaje', 'profesor_viaje.profesor_id', '=', 'profesor.id')
-      ->where('profesor_viaje.viaje_id', $viaje_id)
-      ->limit(4)
-      ->get();
-  }
-
-  public static function renderDestinos()
-  {
-    return Inertia::render('Destinos', ['destinos' => Destino::all()]);
+    return Inertia::render('Destinos', ['destinos' => self::getDestinos()]);
   }
 }

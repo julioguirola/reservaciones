@@ -2,39 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profesor;
-use App\Models\Viaje;
-use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
+use stdClass;
 
 class ViajesController extends Controller
 {
-  public function addProfesorViaje(Request $req)
+  /**
+   * @return array<int,stdClass>
+   */
+  public static function getViajes(): Collection
   {
-    $viaje = Viaje::find($req->id);
-    $profesor = Profesor::find($req->profesor_id);
-    $viaje->profesores()->attach($profesor);
-
-    return ['viaje' => $viaje, 'profesor' => $profesor];
-  }
-
-  public static function getViajes()
-  {
-    return Viaje::select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
+    return DB::table('viaje')
+      ->select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
       ->join('chofer', 'chofer.id', '=', 'viaje.chofer_id')
       ->join('persona', 'persona.id', '=', 'chofer.persona_id')
-      ->get()
-      ->all();
+      ->get();
   }
 
-  public function getProfesoresViaje(string $id)
+  public function renderViajes(): Response
   {
-    $viaje = Viaje::find($id);
-    return $viaje->profesores;
+    return Inertia::render('Viajes', ['viajes' => self::getViajes()]);
   }
-
-  public function renderViajes()
+  public static function countProfesoresViajes(string $viaje_id): int
   {
-    return Inertia::render('Viajes', ['viajes' => ViajesController::getViajes()]);
+    return DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
+  }
+  /**
+   * @param mixed $viaje_id
+   * @return Collection<int,stdClass>
+   */
+  public static function getDestinosViaje($viaje_id): Collection
+  {
+    return DB::table('destino')
+      ->select('destino.nombre as destino')
+      ->distinct('destino')
+      ->join('profesor', 'profesor.destino_id', '=', 'destino.id')
+      ->join('profesor_viaje', 'profesor_viaje.profesor_id', '=', 'profesor.id')
+      ->where('profesor_viaje.viaje_id', $viaje_id)
+      ->limit(4)
+      ->get();
   }
 }

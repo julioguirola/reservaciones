@@ -8,7 +8,7 @@ const props = defineProps<{
 const cant = ref(0);
 
 onMounted(async () => {
-    const data = await fetch(route('profesores.count', props.viaje_id));
+    const data = await fetch(route('viajes.profesores.count', props.viaje_id));
     const res = await data.json();
     cant.value = res;
 });
