@@ -27,6 +27,6 @@ class Viaje extends Model
    */
   public function profesores(): HasMany
   {
-    return $this->hasMany(Profesor::class, 'viaje_profesor', 'profesor_id', 'viaje_id');
+    return $this->hasMany(Profesor::class);
   }
 }

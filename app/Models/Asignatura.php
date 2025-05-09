@@ -15,7 +15,7 @@ class Asignatura extends Model
   /**
    * @return HasMany<Profesor,Asignatura>
    */
-  public function profesor(): HasMany
+  public function profesores(): HasMany
   {
     return $this->hasMany(Profesor::class);
   }
@@ -24,6 +24,6 @@ class Asignatura extends Model
    */
   public function facultades(): BelongsToMany
   {
-    return $this->belongsToMany(Facultad::class, 'facultad_asignaturas');
+    return $this->belongsToMany(Facultad::class);
   }
 }

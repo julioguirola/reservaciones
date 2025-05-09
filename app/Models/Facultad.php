@@ -13,7 +13,7 @@ class Facultad extends Model
   /**
    * @return HasMany<Profesor,Facultad>
    */
-  public function profesor(): HasMany
+  public function profesores(): HasMany
   {
     return $this->hasMany(Profesor::class);
   }
@@ -22,6 +22,6 @@ class Facultad extends Model
    */
   public function asignaturas(): HasMany
   {
-    return $this->hasMany(Asignatura::class, 'facultad_asignaturas');
+    return $this->hasMany(Asignatura::class);
   }
 }

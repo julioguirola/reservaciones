@@ -7,6 +7,7 @@ use App\Models\Chofer;
 use App\Models\Persona;
 use App\Models\Profesor;
 use App\Models\Viaje;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -19,11 +20,12 @@ class DatabaseSeeder extends Seeder
   {
     // User::factory(10)->create();
 
-    // User::factory()->create([
-    //     'name' => 'Test User',
-    //     'email' => 'test@example.com',
-    // ]);
-    DB::statement('PRAGMA foreign_keys=OFF;');
+    User::factory()->create([
+      'name' => 'Julio Guirola',
+      'email' => 'julio@mail.com',
+      'password' => '12345678',
+    ]);
+    // DB::statement('PRAGMA foreign_keys=OFF;');
     DB::table('destino')->insert([
       [
         'nombre' => 'Matanzas',
@@ -121,7 +123,7 @@ class DatabaseSeeder extends Seeder
       ['nombre' => 'Facultad de Ciencias Medicinales'],
     ]);
 
-    DB::table('facultad_asignatura')->insert([
+    DB::table('asignatura_facultad')->insert([
       ['facultad_id' => 1, 'asignatura_id' => 3],
       ['facultad_id' => 1, 'asignatura_id' => 4],
       ['facultad_id' => 1, 'asignatura_id' => 6],
@@ -180,17 +182,17 @@ class DatabaseSeeder extends Seeder
     Chofer::all()->each(function ($chofer) {
       Viaje::factory()
         ->count(rand(1, 5))
-        ->create(['chofer_id' => $chofer->persona_id]);
+        ->create(['chofer_id' => $chofer->id]);
     });
 
     $viajes = Viaje::all();
 
     $viajes->each(function ($viaje) {
       $inserts = array_map(function ($p) use ($viaje) {
-        return ['viaje_id' => $viaje->id, 'profesor_id' => $p->persona_id];
+        return ['viaje_id' => $viaje->id, 'profesor_id' => $p->id];
       }, array_slice(Profesor::all()->all(), rand(1, 10), rand(40, 48)));
-      DB::table('viaje_profesor')->insert($inserts);
+      DB::table('profesor_viaje')->insert($inserts);
     });
-    DB::statement('PRAGMA foreign_keys=ON;');
+    // DB::statement('PRAGMA foreign_keys=ON;');
   }
 }

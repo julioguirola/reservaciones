@@ -14,7 +14,7 @@ class Destino extends Model
   /**
    * @return HasMany<Profesor,Destino>
    */
-  public function profesor(): HasMany
+  public function profesores(): HasMany
   {
     return $this->hasMany(Profesor::class);
   }

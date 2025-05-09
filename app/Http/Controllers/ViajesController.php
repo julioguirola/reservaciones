@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Profesor;
 use App\Models\Viaje;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ViajesController extends Controller
 {
@@ -19,12 +20,20 @@ class ViajesController extends Controller
 
   public static function getViajes()
   {
-    return Viaje::select('viaje.id', 'viaje.fecha', 'persona.nombre')->join('persona', 'persona.id', '=', 'viaje.chofer_id')->get()->all();
+    return Viaje::select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
+      ->join('persona', 'persona.id', '=', 'viaje.chofer_id')
+      ->get()
+      ->all();
   }
 
   public function getProfesoresViaje(string $id)
   {
     $viaje = Viaje::find($id);
     return $viaje->profesores;
+  }
+
+  public function renderViajes()
+  {
+    return Inertia::render('Viajes', ['viajes' => ViajesController::getViajes()]);
   }
 }
