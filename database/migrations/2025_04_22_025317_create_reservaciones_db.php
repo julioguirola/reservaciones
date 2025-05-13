@@ -67,13 +67,6 @@ return new class extends Migration {
       $table->unsignedBigInteger('viaje_id');
       $table->foreign('viaje_id')->references('id')->on('viaje')->cascadeOnDelete();
     });
-
-    Schema::create('asignatura_facultad', function (Blueprint $table) {
-      $table->unsignedBigInteger('asignatura_id');
-      $table->foreign('asignatura_id')->references('id')->on('asignatura');
-      $table->unsignedBigInteger('facultad_id');
-      $table->foreign('facultad_id')->references('id')->on('facultad');
-    });
   }
 
   /**
@@ -90,7 +83,6 @@ return new class extends Migration {
     Schema::dropIfExists('profesor_viaje');
     Schema::dropIfExists('destino');
     Schema::dropIfExists('asignatura');
-    Schema::dropIfExists('asignatura_facultad');
     DB::statement('PRAGMA foreign_keys=ON;');
   }
 };

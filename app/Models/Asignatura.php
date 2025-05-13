@@ -22,11 +22,4 @@ class Asignatura extends Model
   {
     return $this->hasMany(Profesor::class);
   }
-  /**
-   * @return BelongsToMany<Facultad,Asignatura,Pivot>
-   */
-  public function facultades(): BelongsToMany
-  {
-    return $this->belongsToMany(Facultad::class);
-  }
 }

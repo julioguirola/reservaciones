@@ -20,11 +20,4 @@ class Facultad extends Model
   {
     return $this->hasMany(Profesor::class);
   }
-  /**
-   * @return HasMany<Asignatura,Facultad>
-   */
-  public function asignaturas(): HasMany
-  {
-    return $this->hasMany(Asignatura::class);
-  }
 }

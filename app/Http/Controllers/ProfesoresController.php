@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asignatura;
+use App\Models\Facultad;
+use App\Models\Persona;
+use App\Models\Profesor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Validator;
 use stdClass;
 
 class ProfesoresController extends Controller
@@ -17,21 +24,121 @@ class ProfesoresController extends Controller
   {
     return DB::table('profesor')
       ->select(
-        'persona.id as profesor_id',
+        'profesor.id',
+        'persona.id as persona_id',
         'persona.nombre',
         'persona.carnet_identidad',
         'destino.nombre as destino',
         'facultad.nombre as facultad',
         'asignatura.nombre as asignatura',
+        'destino.id as destino_id',
+        'facultad.id as facultad_id',
+        'asignatura.id as asignatura_id',
       )
       ->join('persona', 'profesor.persona_id', '=', 'persona.id')
       ->join('destino', 'profesor.destino_id', '=', 'destino.id')
       ->join('facultad', 'profesor.facultad_id', '=', 'facultad.id')
       ->join('asignatura', 'profesor.asignatura_id', '=', 'asignatura.id')
+      ->where('profesor.deleted_at', null)
       ->get();
   }
   public static function renderProfesores(): Response
   {
     return Inertia::render('Profesores', ['profesores' => self::getProfesores()]);
+  }
+  public static function deleteProfesor(string $profesor_id): Profesor
+  {
+    $profesor = Profesor::find($profesor_id);
+    $profesor->delete();
+    return $profesor;
+  }
+
+  public static function editProfesor(Request $request, string $profesor_id)
+  {
+    $data = $request->all();
+    $validator = Validator::make($data, [
+      'nombre' => 'min:5|max:30|required',
+      'carnet_identidad' => 'digits:11|required',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+
+    Profesor::where('id', $profesor_id)->update([
+      'destino_id' => $data['destino_id'],
+      'facultad_id' => $data['facultad_id'],
+      'asignatura_id' => $data['asignatura_id'],
+    ]);
+
+    Persona::where('id', $data['persona_id'])->update([
+      'nombre' => $data['nombre'],
+      'carnet_identidad' => $data['carnet_identidad'],
+    ]);
+    return self::getProfesor($profesor_id);
+  }
+  /**
+   * @return Collection<int,Asignatura>
+   */
+  public static function getAsignaturas(): Collection
+  {
+    return Asignatura::all();
+  }
+  /**
+   * @return Collection<int,Facultad>
+   */
+  public static function getFacultades(): Collection
+  {
+    return Facultad::all();
+  }
+
+  public static function getProfesor(string $profesor_id)
+  {
+    $profesor = DB::table('profesor')
+      ->select(
+        'profesor.id',
+        'persona.id as persona_id',
+        'persona.nombre',
+        'persona.carnet_identidad',
+        'destino.nombre as destino',
+        'facultad.nombre as facultad',
+        'asignatura.nombre as asignatura',
+        'destino.id as destino_id',
+        'facultad.id as facultad_id',
+        'asignatura.id as asignatura_id',
+      )
+      ->join('persona', 'profesor.persona_id', '=', 'persona.id')
+      ->join('destino', 'profesor.destino_id', '=', 'destino.id')
+      ->join('facultad', 'profesor.facultad_id', '=', 'facultad.id')
+      ->join('asignatura', 'profesor.asignatura_id', '=', 'asignatura.id')
+      ->where('profesor.deleted_at', null)
+      ->where('profesor.id', $profesor_id)
+      ->get();
+
+    return $profesor;
+  }
+
+  public static function crearProfesor(Request $request)
+  {
+    $data = $request->all();
+    $validator = Validator::make($data, [
+      'nombre' => 'min:5|max:30|required',
+      'carnet_identidad' => 'digits:11|required',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+    return;
   }
 }

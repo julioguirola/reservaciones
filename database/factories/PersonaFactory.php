@@ -20,7 +20,7 @@ class PersonaFactory extends Factory
   {
     return [
       'nombre' => fake()->firstName() . ' ' . fake()->lastName(),
-      'carnet_identidad' => fake()->numerify('##########'),
+      'carnet_identidad' => fake()->numerify('###########'),
     ];
   }
 }
