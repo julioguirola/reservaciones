@@ -21,4 +21,10 @@ Route::prefix('profesores')
     Route::get('/facultades', [ProfesoresController::class, 'getFacultades'])
       ->middleware(['auth', 'verified'])
       ->name('.facultades');
+    Route::get('/{profesor_id}', [ProfesoresController::class, 'infoProfesor'])
+      ->middleware(['auth', 'verified'])
+      ->name('.info');
+    Route::get('/{profesor_id}/viajes', [ProfesoresController::class, 'getViajesProfesor'])
+      ->middleware(['auth', 'verified'])
+      ->name('.viajes');
   });

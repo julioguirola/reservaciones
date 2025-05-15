@@ -125,27 +125,42 @@ class DatabaseSeeder extends Seeder
 
     Persona::factory()
       ->has(Chofer::factory()->count(1), 'chofer')
-      ->count(5)
+      ->count(10)
       ->create();
 
     Persona::factory()
       ->has(Profesor::factory()->count(1), 'profesor')
-      ->count(48)
+      ->count(200)
       ->create();
 
     Chofer::all()->each(function ($chofer) {
       Viaje::factory()
-        ->count(rand(1, 5))
+        ->count(rand(5, 10))
         ->create(['chofer_id' => $chofer->id]);
     });
 
     $viajes = Viaje::all();
 
     $viajes->each(function ($viaje) {
+      $base = rand(1, 152);
+      $top = rand(0, 1) == 1 ? rand(8, 47) : 48;
+      $profesores = array_slice(Profesor::all()->all(), $base, $top);
       $inserts = array_map(function ($p) use ($viaje) {
         return ['viaje_id' => $viaje->id, 'profesor_id' => $p->id];
-      }, array_slice(Profesor::all()->all(), rand(1, 10), rand(40, 48)));
+      }, $profesores);
       DB::table('profesor_viaje')->insert($inserts);
+    });
+
+    Profesor::all()->each(function ($profesor) {
+      $profesor->viajes->each(function ($viaje) use ($profesor) {
+        $fecha = $viaje['fecha'];
+        $mes = explode('-', $fecha)[1];
+        if ($mes == '08' || $mes == '09') {
+          DB::table('profesor')
+            ->where('id', $profesor['id'])
+            ->update(['tarifa' => true]);
+        }
+      });
     });
     // DB::statement('PRAGMA foreign_keys=ON;');
   }

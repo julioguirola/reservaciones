@@ -26,7 +26,7 @@ class ViajesController extends Controller
   {
     return Inertia::render('Viajes', ['viajes' => self::getViajes()]);
   }
-  public static function countProfesoresViajes(string $viaje_id): int
+  public static function countProfesoresViaje(string $viaje_id): int
   {
     return DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
   }
@@ -42,7 +42,41 @@ class ViajesController extends Controller
       ->join('profesor', 'profesor.destino_id', '=', 'destino.id')
       ->join('profesor_viaje', 'profesor_viaje.profesor_id', '=', 'profesor.id')
       ->where('profesor_viaje.viaje_id', $viaje_id)
-      ->limit(4)
       ->get();
   }
+
+  public static function getProfesoresViaje(int $viaje_id)
+  {
+    return DB::table('profesor_viaje')
+      ->select('profesor_viaje.profesor_id', 'persona.id as persona_id', 'persona.nombre', 'destino.nombre as destino', 'destino.precio as tarifa')
+      ->where('profesor_viaje.viaje_id', $viaje_id)
+      ->join('persona', 'profesor.persona_id', '=', 'persona.id')
+      ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
+      ->join('destino', 'profesor.destino_id', '=', 'destino.id')
+      ->get();
+  }
+
+  public static function getRecaudadoViaje(int $viaje_id)
+  {
+    return $tarifas_viaje = DB::table('profesor_viaje')
+      ->select('destino.precio')
+      ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
+      ->join('destino', 'profesor.destino_id', '=', 'destino.id')
+      ->where('profesor_viaje.viaje_id', $viaje_id)
+      ->where('profesor.tarifa', true)
+      ->sum('destino.precio');
+  }
+  public static function crearViaje(Request $request) {}
+  public static function addProfesorViaje(Request $request)
+  {
+    $data = $request->all();
+    DB::table('profesor_viaje')->insert([
+      'profesor_id' => $data['profesor_id'],
+      'viaje_id' => $data['viaje_id'],
+    ]);
+  }
+  public static function changeChoferViaje(Request $request, string $viaje_id) {
+
+  }
+  public static function () {}
 }

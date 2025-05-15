@@ -13,6 +13,7 @@ class Destino extends Model
   protected $table = 'destino';
   protected $primaryKey = 'id';
   public float $precio;
+  public $timestamps = false;
   public string $nombre;
   /**
    * @return HasMany<Profesor,Destino>

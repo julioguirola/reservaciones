@@ -141,4 +141,14 @@ class ProfesoresController extends Controller
     }
     return;
   }
+  public static function getViajesProfesor(string $profesor_id)
+  {
+    return DB::table('profesor_viaje')
+      ->select('profesor_viaje.profesor_id', 'persona.id as persona_id', 'persona.nombre', 'viaje.id', 'viaje.fecha')
+      ->where('profesor_viaje.profesor_id', $profesor_id)
+      ->join('persona', 'profesor.persona_id', '=', 'persona.id')
+      ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
+      ->join('viaje', 'viaje.id', '=', 'profesor_viaje.viaje_id')
+      ->get();
+  }
 }

@@ -74,4 +74,17 @@ class ChoferesController extends Controller
     ]);
     return self::getChofer($chofer_id);
   }
+
+  public static function getViajesChofer(string $chofer_id)
+  {
+    return DB::table('viaje')->select('viaje.id', 'viaje.fecha')->where('chofer_id', $chofer_id)->get();
+  }
+  public static function countViajesChofer(string $chofer_id): int
+  {
+    return DB::table('viaje')->where('chofer_id', $chofer_id)->count();
+  }
+  public static function crearProfesor(Request $request) {
+      $nuevo_profesor = new ;
+  }
+
 }

@@ -9,4 +9,7 @@ Route::prefix('destinos')
     Route::get('/data', [DestinosController::class, 'getDestinos'])
       ->middleware(['auth', 'verified'])
       ->name('.data');
+    Route::patch('/{destino_id}', [DestinosController::class, 'editDestino'])
+      ->middleware(['auth', 'verified'])
+      ->name('.editar');
   });

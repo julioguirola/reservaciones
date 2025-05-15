@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
+import EditDestinoDialog from '@/components/EditDestinoDialog.vue';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { Pencil } from 'lucide-vue-next';
+
+interface Destino {
+    id: number;
+    nombre: string;
+    precio: number;
+}
+
+const props = defineProps<{
+    destinos: Destino[];
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,14 +37,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="destino in $page.props.destinos" :key="destino.id">
+                    <TableRow v-for="destino in props.destinos" :key="destino.id">
                         <TableCell class="font-medium">
                             {{ destino.nombre }}
                         </TableCell>
                         <TableCell> {{ destino.precio }} $ </TableCell>
-                        <TableCell
-                            ><Button class="bg-green-500"><Pencil></Pencil></Button
-                        ></TableCell>
+                        <TableCell><EditDestinoDialog :precio="destino.precio" :destino_id="destino.id" :nombre="destino.nombre" /></TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

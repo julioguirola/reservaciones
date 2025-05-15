@@ -18,6 +18,7 @@ class Profesor extends Model
   use HasFactory, HasUuids, SoftDeletes;
   protected $table = 'profesor';
   public $timestamps = false;
+  public bool $tarifa;
   /**
    * @return BelongsTo<Persona,Profesor>
    */
