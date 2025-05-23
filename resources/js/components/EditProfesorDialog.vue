@@ -74,8 +74,8 @@ const submit = async () => {
         errors.value = {};
         hiddenCloseBtn.value?.click();
         toast({
-            title: '✅ Operacion realizada',
-            description: 'Profesor modificado con exito',
+            title: '✅ Operación realizada',
+            description: 'Profesor modificado con éxito',
             duration: 1500,
         });
         router.reload();

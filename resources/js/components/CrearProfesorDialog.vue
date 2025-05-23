@@ -76,8 +76,8 @@ const submit = async () => {
         asignatura_seleccionada.value = '';
         destino_seleccionado.value = '';
         toast({
-            title: '✅ Operacion realizada',
-            description: 'Nuevo profesor registrado con exito',
+            title: '✅ Operación realizada',
+            description: 'Nuevo profesor registrado con éxito',
             duration: 1500,
         });
         router.reload();

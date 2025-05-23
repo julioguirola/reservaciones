@@ -4,7 +4,7 @@ import ProfesoresCant from '@/components/ProfesoresCant.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { CalendarDays, UserCog } from 'lucide-vue-next';
 
 interface Viaje {
@@ -36,7 +36,10 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <Card v-for="viaje in props.viajes" :key="viaje.id">
                     <CardHeader class="flex flex-row items-center justify-between">
                         <CardTitle>Viaje {{ viaje.id }}</CardTitle>
-                        <ProfesoresCant :profesores_count="viaje.profesores_count" />
+                        <ProfesoresCant
+                            @click="router.get(route('viajes.profesores', { viaje_id: viaje.id }))"
+                            :profesores_count="viaje.profesores_count"
+                        />
                     </CardHeader>
                     <CardContent class="flex items-center gap-1"><UserCog /> {{ viaje.chofer_nombre }} </CardContent>
                     <CardContent class="flex items-center gap-1"> <CalendarDays />{{ viaje.fecha.split(' ')[0] }}</CardContent>

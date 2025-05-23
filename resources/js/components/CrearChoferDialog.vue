@@ -56,8 +56,8 @@ const submit = async () => {
         licencia_numero.value = '';
         carnet_identidad.value = '';
         toast({
-            title: '✅ Operacion realizada',
-            description: 'Nuevo chofer registrado con exito',
+            title: '✅ Operación realizada',
+            description: 'Nuevo chofer registrado con éxito',
             duration: 1500,
         });
         router.reload();

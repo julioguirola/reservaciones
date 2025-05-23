@@ -35,7 +35,7 @@ const submit = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="email">Email</Label>
                     <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
                     <InputError :message="form.errors.email" />
                 </div>
@@ -55,7 +55,7 @@ const submit = () => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation">Confirm password</Label>
+                    <Label for="password_confirmation">Confirmar contraseña</Label>
                     <Input
                         id="password_confirmation"
                         type="password"
@@ -63,7 +63,7 @@ const submit = () => {
                         :tabindex="4"
                         autocomplete="new-password"
                         v-model="form.password_confirmation"
-                        placeholder="Confirm password"
+                        placeholder="Confirmar contraseña"
                     />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>

@@ -55,13 +55,16 @@ class ViajesController extends Controller
 
   public static function getProfesoresViaje(int $viaje_id)
   {
-    return DB::table('profesor_viaje')
+    $profesores_viaje = DB::table('profesor_viaje')
       ->select('profesor_viaje.profesor_id', 'persona.id as persona_id', 'persona.nombre', 'destino.nombre as destino', 'destino.precio as tarifa')
       ->where('profesor_viaje.viaje_id', $viaje_id)
       ->join('persona', 'profesor.persona_id', '=', 'persona.id')
       ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
       ->join('destino', 'profesor.destino_id', '=', 'destino.id')
-      ->get();
+      ->get()
+      ->all();
+
+    return Inertia::render('ProfesoresViaje', ['profesores' => $profesores_viaje, 'viaje_id' => $viaje_id]);
   }
 
   public static function getRecaudadoViaje(int $viaje_id)

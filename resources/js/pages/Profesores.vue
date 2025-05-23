@@ -40,8 +40,8 @@ const heads = ['Nombre', 'Carnet de Identidad', 'Origen', 'Facultad', 'Asignatur
 async function deleteProfesor(profesor_id: string) {
     await fetch(route('profesores.eliminar', { profesor_id }), { method: 'DELETE' });
     toast({
-        title: '✅ Operacion realizada',
-        description: 'Profesor eliminado con exito',
+        title: '✅ Operación realizada',
+        description: 'Profesor eliminado con éxito',
         duration: 1500,
     });
     router.reload();

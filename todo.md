@@ -1,5 +1,3 @@
 - Agregar profesor al viaje
 - Editar chofer y fecha del viaje
-- Mostrar informacion especifica del viaje
 - Mostrar errores de validacion
-- ortografia y traducir
