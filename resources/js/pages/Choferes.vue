@@ -2,7 +2,6 @@
 import EditChoferDialog from '@/components/EditChoferDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import ViajesCant from '@/components/ViajesCant.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
@@ -21,6 +20,7 @@ interface Chofer {
     licencia_numero: string;
     carnet_identidad: string;
     nombre: string;
+    cant_viajes: number;
 }
 
 const props = defineProps<{
@@ -45,8 +45,8 @@ async function deleteChofer(chofer_id: string) {
                         <TableHead> Nombre </TableHead>
                         <TableHead> Carnet de Identidad </TableHead>
                         <TableHead> Número de Licencia </TableHead>
-                        <TableHead> Acciones </TableHead>
                         <TableHead> Cantidad de viajes </TableHead>
+                        <TableHead> Acciones </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -56,6 +56,7 @@ async function deleteChofer(chofer_id: string) {
                         </TableCell>
                         <TableCell> {{ chofer.carnet_identidad }} </TableCell>
                         <TableCell> {{ chofer.licencia_numero }} </TableCell>
+                        <TableCell> {{ chofer.cant_viajes }} </TableCell>
                         <TableCell class="flex gap-1">
                             <EditChoferDialog
                                 :licencia_numero="chofer.licencia_numero"
@@ -66,7 +67,6 @@ async function deleteChofer(chofer_id: string) {
                             />
                             <Button class="bg-red-600" @click="deleteChofer(chofer.id)"><Trash></Trash></Button>
                         </TableCell>
-                        <TableCell> <ViajesCant :chofer_id="chofer.id" /> </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

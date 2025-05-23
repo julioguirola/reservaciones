@@ -14,7 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pencil } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
+import InputError from './InputError.vue';
 
 interface ProfesorCampos {
     id?: number;
@@ -29,6 +30,9 @@ const props = defineProps<{
     asignatura_id: number;
     profesor_id: string;
     persona_id: string;
+    destinos: ProfesorCampos[];
+    asignaturas: ProfesorCampos[];
+    facultades: ProfesorCampos[];
 }>();
 
 const nombre = ref(props.nombre);
@@ -37,24 +41,13 @@ const destino_seleccionado = ref(props.destino_id);
 const asignatura_seleccionada = ref(props.asignatura_id);
 const facultad_seleccionada = ref(props.facultad_id);
 
-let destinos: ProfesorCampos[] = [];
-let asignaturas: ProfesorCampos[] = [];
-let facultades: ProfesorCampos[] = [];
-
-onMounted(async () => {
-    let res = await fetch(route('destinos.data'));
-    let data = await res.json();
-    destinos = data;
-    res = await fetch(route('profesores.asignaturas'));
-    data = await res.json();
-    asignaturas = data;
-    res = await fetch(route('profesores.facultades'));
-    data = await res.json();
-    facultades = data;
-});
+const errors = ref<{
+    carnet_identidad?: string[];
+    nombre?: string[];
+}>({});
 
 const submit = async () => {
-    await fetch(route('profesores.editar', props.profesor_id), {
+    const res = await fetch(route('profesores.editar', props.profesor_id), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -68,6 +61,10 @@ const submit = async () => {
             persona_id: props.persona_id,
         }),
     });
+    const data = await res.json();
+    if (data.errors) {
+        errors.value = data.errors;
+    }
 };
 </script>
 
@@ -85,10 +82,12 @@ const submit = async () => {
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="nombre" class="text-right"> Nombre </Label>
                     <Input id="nombre" v-model="nombre" class="col-span-3" />
+                    <InputError v-if="errors.nombre" :message="errors.nombre[0]" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="carnet_identidad" class="text-right"> Carnet de Identidad </Label>
                     <Input id="carnet_identidad" v-model="carnet_identidad" class="col-span-3" />
+                    <InputError v-if="errors.carnet_identidad" :message="errors.carnet_identidad[0]" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="origen" class="text-right"> Origen</Label>

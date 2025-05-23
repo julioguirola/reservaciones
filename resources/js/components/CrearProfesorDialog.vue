@@ -13,34 +13,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { onMounted, ref } from 'vue';
+import { Plus } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 interface ProfesorCampos {
     id?: number;
     nombre?: string;
 }
 
+const props = defineProps<{
+    destinos: ProfesorCampos[];
+    asignaturas: ProfesorCampos[];
+    facultades: ProfesorCampos[];
+}>();
+
 const nombre = ref('');
 const carnet_identidad = ref('');
 const destino_seleccionado = ref('');
 const asignatura_seleccionada = ref('');
 const facultad_seleccionada = ref('');
-
-let destinos: ProfesorCampos[] = [];
-let asignaturas: ProfesorCampos[] = [];
-let facultades: ProfesorCampos[] = [];
-
-onMounted(async () => {
-    let res = await fetch(route('destinos.data'));
-    let data = await res.json();
-    destinos = data;
-    res = await fetch(route('profesores.asignaturas'));
-    data = await res.json();
-    asignaturas = data;
-    res = await fetch(route('profesores.facultades'));
-    data = await res.json();
-    facultades = data;
-});
 
 const submit = async () => {
     await fetch(route('profesores.crear'), {
@@ -87,7 +78,9 @@ const submit = async () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem v-for="destino in destinos" :value="destino.id!" :key="destino.id"> {{ destino.nombre }} </SelectItem>
+                                <SelectItem v-for="destino in props.destinos" :value="destino.id!" :key="destino.id">
+                                    {{ destino.nombre }}
+                                </SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
@@ -101,7 +94,7 @@ const submit = async () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem v-for="asignatura in asignaturas" :value="asignatura.id!" :key="asignatura.id">
+                                <SelectItem v-for="asignatura in props.asignaturas" :value="asignatura.id!" :key="asignatura.id">
                                     {{ asignatura.nombre }}
                                 </SelectItem>
                             </SelectGroup>
@@ -117,7 +110,7 @@ const submit = async () => {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem v-for="facultad in facultades" :value="facultad.id!" :key="facultad.id">
+                                <SelectItem v-for="facultad in props.facultades" :value="facultad.id!" :key="facultad.id">
                                     {{ facultad.nombre }}
                                 </SelectItem>
                             </SelectGroup>

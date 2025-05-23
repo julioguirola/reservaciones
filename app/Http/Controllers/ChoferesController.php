@@ -17,13 +17,20 @@ class ChoferesController extends Controller
   /**
    * @return Collection<int,stdClass>
    */
-  public static function getChoferes(): Collection
+  public static function getChoferes()
   {
-    return DB::table('chofer')
+    $choferes = DB::table('chofer')
       ->select('chofer.id', 'persona.id as persona_id', 'persona.nombre', 'persona.carnet_identidad', 'chofer.licencia_numero')
       ->join('persona', 'chofer.persona_id', '=', 'persona.id')
       ->where('chofer.deleted_at', null)
-      ->get();
+      ->get()
+      ->all();
+
+    return array_map(function ($chofer) {
+      $cant_viajes = DB::table('viaje')->where('chofer_id', $chofer->id)->count();
+      $chofer->cant_viajes = $cant_viajes;
+      return $chofer;
+    }, $choferes);
   }
 
   public static function getChofer(string $chofer_id)
@@ -79,12 +86,8 @@ class ChoferesController extends Controller
   {
     return DB::table('viaje')->select('viaje.id', 'viaje.fecha')->where('chofer_id', $chofer_id)->get();
   }
-  public static function countViajesChofer(string $chofer_id): int
+  public static function crearProfesor(Request $request)
   {
-    return DB::table('viaje')->where('chofer_id', $chofer_id)->count();
+    // $nuevo_profesor = new ;
   }
-  public static function crearProfesor(Request $request) {
-      $nuevo_profesor = new ;
-  }
-
 }

@@ -18,7 +18,4 @@ Route::prefix('choferes')
     Route::get('/{chofer_id}/viajes', [ChoferesController::class, 'getViajesChofer'])
       ->middleware(['auth', 'verified'])
       ->name('.viajes');
-    Route::get('/viajes/count/{chofer_id}', [ChoferesController::class, 'countViajesChofer'])
-      ->middleware(['auth', 'verified'])
-      ->name('.viajes.count');
   });

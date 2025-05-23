@@ -82,19 +82,12 @@ class ProfesoresController extends Controller
     ]);
     return self::getProfesor($profesor_id);
   }
-  /**
-   * @return Collection<int,Asignatura>
-   */
-  public static function getAsignaturas(): Collection
+  public static function getAsignaturasYFacultades()
   {
-    return Asignatura::all();
-  }
-  /**
-   * @return Collection<int,Facultad>
-   */
-  public static function getFacultades(): Collection
-  {
-    return Facultad::all();
+    $asignaturas = Asignatura::all()->all();
+    $facultades = Facultad::all()->all();
+
+    return ['asignaturas' => $asignaturas, 'facultades' => $facultades];
   }
 
   public static function getProfesor(string $profesor_id)

@@ -11,6 +11,8 @@ interface Viaje {
     id: number;
     chofer_nombre: string;
     fecha: string;
+    destinos: string[];
+    profesores_count: number;
 }
 
 const props = defineProps<{
@@ -33,11 +35,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <Card v-for="viaje in props.viajes" :key="viaje.id">
                     <CardHeader class="flex flex-row items-center justify-between">
                         <CardTitle>Viaje {{ viaje.id }}</CardTitle>
-                        <ProfesoresCant :viaje_id="viaje.id" />
+                        <ProfesoresCant :profesores_count="viaje.profesores_count" />
                     </CardHeader>
                     <CardContent class="flex items-center gap-1"><UserCog /> {{ viaje.chofer_nombre }} </CardContent>
                     <CardContent class="flex items-center gap-1"> <CalendarDays />{{ viaje.fecha.split(' ')[0] }}</CardContent>
-                    <CardContent><DestinosViajes :viaje_id="viaje.id"></DestinosViajes></CardContent>
+                    <CardContent><DestinosViajes :destinos="viaje.destinos"></DestinosViajes></CardContent>
                 </Card>
             </div>
         </div>

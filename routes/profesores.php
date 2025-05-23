@@ -15,12 +15,9 @@ Route::prefix('profesores')
     Route::post('/', [ProfesoresController::class, 'crearProfesor'])
       ->middleware(['auth', 'verified'])
       ->name('.crear');
-    Route::get('/asignaturas', [ProfesoresController::class, 'getAsignaturas'])
+    Route::get('/asignaturas_facultades', [ProfesoresController::class, 'getAsignaturasYFacultades'])
       ->middleware(['auth', 'verified'])
-      ->name('.asignaturas');
-    Route::get('/facultades', [ProfesoresController::class, 'getFacultades'])
-      ->middleware(['auth', 'verified'])
-      ->name('.facultades');
+      ->name('.asignaturas_facultades');
     Route::get('/{profesor_id}', [ProfesoresController::class, 'infoProfesor'])
       ->middleware(['auth', 'verified'])
       ->name('.info');

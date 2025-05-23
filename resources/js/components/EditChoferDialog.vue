@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
-import { ref } from 'vue';
-
+import { ref, useTemplateRef } from 'vue';
+import InputError from './InputError.vue';
 const props = defineProps<{
     nombre: string;
     carnet_identidad: string;
@@ -23,12 +24,20 @@ const props = defineProps<{
     chofer_id: string;
 }>();
 
+const errors = ref<{
+    carnet_identidad?: string[];
+    nombre?: string[];
+    licencia_numero?: string[];
+}>({});
+
 const nombre = ref(props.nombre);
 const carnet_identidad = ref(props.carnet_identidad);
 const licencia_numero = ref(props.licencia_numero);
 
+const hiddenCloseBtn = useTemplateRef<HTMLButtonElement | null>('hiddenCloseBtn');
+
 const submit = async () => {
-    await fetch(route('choferes.editar', props.chofer_id), {
+    const res = await fetch(route('choferes.editar', props.chofer_id), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -40,6 +49,14 @@ const submit = async () => {
             persona_id: props.persona_id,
         }),
     });
+    const data = await res.json();
+    if (data.errors) {
+        errors.value = data.errors;
+    } else {
+        errors.value = {};
+        hiddenCloseBtn.value?.click();
+        router.reload();
+    }
 };
 </script>
 
@@ -57,21 +74,27 @@ const submit = async () => {
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="nombre" class="text-right"> Nombre </Label>
                     <Input id="nombre" v-model="nombre" class="col-span-3" />
+                    <InputError v-if="errors.nombre" :message="errors.nombre[0]" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="carnet_identidad" class="text-right"> Carnet de Identidad </Label>
                     <Input id="carnet_identidad" v-model="carnet_identidad" class="col-span-3" />
+                    <InputError v-if="errors.carnet_identidad" :message="errors.carnet_identidad[0]" />
                 </div>
 
                 <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="carnet_identidad" class="text-right"> Carnet de Identidad </Label>
-                    <Input id="carnet_identidad" v-model="licencia_numero" class="col-span-3" />
+                    <Label for="licencia_numero" class="text-right"> Número de licencia </Label>
+                    <Input id="licencia_numero" v-model="licencia_numero" class="col-span-3" />
+                    <InputError v-if="errors.licencia_numero" :message="errors.licencia_numero[0]" />
                 </div>
             </div>
             <DialogFooter
                 ><DialogClose> <Button variant="outline"> Cancelar </Button></DialogClose>
 
                 <Button @click="submit"> Guardar Cambios</Button>
+                <DialogClose as-child>
+                    <button ref="hiddenCloseBtn" style="display: none"></button>
+                </DialogClose>
             </DialogFooter>
         </DialogContent>
     </Dialog>

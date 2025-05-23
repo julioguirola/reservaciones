@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { Trash } from 'lucide-vue-next';
+import { onMounted, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,13 +38,32 @@ async function deleteProfesor(profesor_id: string) {
     await fetch(route('profesores.eliminar', { profesor_id }), { method: 'DELETE' });
     router.reload();
 }
+
+interface ProfesorCampos {
+    id?: number;
+    nombre?: string;
+}
+
+const destinos = ref<ProfesorCampos[]>([]);
+const asignaturas = ref<ProfesorCampos[]>([]);
+const facultades = ref<ProfesorCampos[]>([]);
+
+onMounted(async () => {
+    let res = await fetch(route('destinos.data'));
+    let data = await res.json();
+    destinos.value = data;
+    res = await fetch(route('profesores.asignaturas_facultades'));
+    data = await res.json();
+    asignaturas.value = data.asignaturas;
+    facultades.value = data.facultades;
+});
 </script>
 
 <template>
     <Head title="Profesores" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <CrearProfesorDialog />
+            <CrearProfesorDialog :destinos="destinos" :facultades="facultades" :asignaturas="asignaturas" />
             <Table>
                 <TableCaption>Informacion de los profesores</TableCaption>
                 <TableHeader>
@@ -70,6 +90,9 @@ async function deleteProfesor(profesor_id: string) {
                                 :asignatura_id="profesor.asignatura_id"
                                 :profesor_id="profesor.id"
                                 :persona_id="profesor.persona_id"
+                                :destinos="destinos"
+                                :facultades="facultades"
+                                :asignaturas="asignaturas"
                             />
                             <Button @click="deleteProfesor(profesor.id)" class="bg-red-600"><Trash></Trash></Button>
                         </TableCell>

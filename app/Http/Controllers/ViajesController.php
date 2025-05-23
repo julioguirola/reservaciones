@@ -13,36 +13,40 @@ class ViajesController extends Controller
   /**
    * @return array<int,stdClass>
    */
-  public static function getViajes(): Collection
+  public static function getViajes()
   {
-    return DB::table('viaje')
+    $viajes = DB::table('viaje')
       ->select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
       ->join('chofer', 'chofer.id', '=', 'viaje.chofer_id')
       ->join('persona', 'persona.id', '=', 'chofer.persona_id')
-      ->get();
+      ->get()
+      ->all();
+
+    $viajes_destinos = array_map(function ($viaje) {
+      $destinos = DB::table('destino')
+        ->select('destino.nombre')
+        ->distinct('destino')
+        ->join('profesor', 'profesor.destino_id', '=', 'destino.id')
+        ->join('profesor_viaje', 'profesor_viaje.profesor_id', '=', 'profesor.id')
+        ->where('profesor_viaje.viaje_id', $viaje->id)
+        ->get()
+        ->all();
+
+      $profesores_count = DB::table('profesor_viaje')->where('viaje_id', $viaje->id)->count();
+
+      $viaje->destinos = array_map(function ($destino) {
+        return $destino->nombre;
+      }, $destinos);
+      $viaje->profesores_count = $profesores_count;
+      return $viaje;
+    }, $viajes);
+
+    return $viajes_destinos;
   }
 
   public function renderViajes(): Response
   {
     return Inertia::render('Viajes', ['viajes' => self::getViajes()]);
-  }
-  public static function countProfesoresViaje(string $viaje_id): int
-  {
-    return DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
-  }
-  /**
-   * @param mixed $viaje_id
-   * @return Collection<int,stdClass>
-   */
-  public static function getDestinosViaje($viaje_id): Collection
-  {
-    return DB::table('destino')
-      ->select('destino.nombre as destino')
-      ->distinct('destino')
-      ->join('profesor', 'profesor.destino_id', '=', 'destino.id')
-      ->join('profesor_viaje', 'profesor_viaje.profesor_id', '=', 'profesor.id')
-      ->where('profesor_viaje.viaje_id', $viaje_id)
-      ->get();
   }
 
   public static function getProfesoresViaje(int $viaje_id)
@@ -75,8 +79,5 @@ class ViajesController extends Controller
       'viaje_id' => $data['viaje_id'],
     ]);
   }
-  public static function changeChoferViaje(Request $request, string $viaje_id) {
-
-  }
-  public static function () {}
+  public static function changeChoferViaje(Request $request, string $viaje_id) {}
 }

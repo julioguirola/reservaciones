@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
+import InputError from './InputError.vue';
 
 const props = defineProps<{
     precio: number;
@@ -21,10 +22,14 @@ const props = defineProps<{
     nombre: string;
 }>();
 
+const errors = ref<{
+    precio?: string[];
+}>({});
+
 const precio = ref(props.precio);
 
 const submit = async () => {
-    await fetch(route('destinos.editar', props.destino_id), {
+    const res = await fetch(route('destinos.editar', props.destino_id), {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -33,6 +38,10 @@ const submit = async () => {
             precio: precio.value,
         }),
     });
+    const data = await res.json();
+    if (data.errors) {
+        errors.value = data.errors;
+    }
 };
 </script>
 
@@ -50,6 +59,7 @@ const submit = async () => {
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="nombre" class="text-right"> Precio </Label>
                     <Input id="nombre" v-model="precio" class="col-span-3" />
+                    <InputError v-if="errors.precio" :message="errors.precio[0]" />
                 </div>
             </div>
             <DialogFooter
