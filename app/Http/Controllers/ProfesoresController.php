@@ -7,6 +7,7 @@ use App\Models\Facultad;
 use App\Models\Persona;
 use App\Models\Profesor;
 use Illuminate\Support\Collection;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -111,7 +112,7 @@ class ProfesoresController extends Controller
       ->join('asignatura', 'profesor.asignatura_id', '=', 'asignatura.id')
       ->where('profesor.deleted_at', null)
       ->where('profesor.id', $profesor_id)
-      ->get();
+      ->get()[0];
 
     return $profesor;
   }
@@ -122,6 +123,9 @@ class ProfesoresController extends Controller
     $validator = Validator::make($data, [
       'nombre' => 'min:5|max:30|required',
       'carnet_identidad' => 'digits:11|required',
+      'facultad_id' => 'required|numeric',
+      'asignatura_id' => 'required|numeric',
+      'destino_id' => 'required|numeric',
     ]);
 
     if ($validator->fails()) {
@@ -132,7 +136,30 @@ class ProfesoresController extends Controller
         422,
       );
     }
-    return;
+
+    try {
+      $persona = Persona::create([
+        'nombre' => $data['nombre'],
+        'carnet_identidad' => $data['carnet_identidad'],
+      ]);
+    } catch (QueryException $e) {
+      return response()->json(
+        [
+          'errors' => ['carnet_identidad' => ['unique.constraint']],
+        ],
+        422,
+      );
+    }
+
+    $profesor = Profesor::create([
+      'persona_id' => $persona->id,
+      'destino_id' => $data['destino_id'],
+      'asignatura_id' => $data['asignatura_id'],
+      'facultad_id' => $data['facultad_id'],
+      'tarifa' => false,
+    ]);
+
+    return ['profesor' => self::getProfesor($profesor->id)];
   }
   public static function getViajesProfesor(string $profesor_id)
   {

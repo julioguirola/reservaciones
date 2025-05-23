@@ -34,10 +34,14 @@ class ViajesController extends Controller
 
       $profesores_count = DB::table('profesor_viaje')->where('viaje_id', $viaje->id)->count();
 
+      $recaudado = self::getRecaudadoViaje($viaje->id);
+
       $viaje->destinos = array_map(function ($destino) {
         return $destino->nombre;
       }, $destinos);
       $viaje->profesores_count = $profesores_count;
+      $viaje->recaudado = $recaudado;
+
       return $viaje;
     }, $viajes);
 

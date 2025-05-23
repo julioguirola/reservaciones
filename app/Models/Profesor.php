@@ -19,6 +19,7 @@ class Profesor extends Model
   protected $table = 'profesor';
   public $timestamps = false;
   public bool $tarifa;
+  protected $fillable = ['persona_id', 'destino_id', 'asignatura_id', 'facultad_id', 'tarifa'];
   /**
    * @return BelongsTo<Persona,Profesor>
    */

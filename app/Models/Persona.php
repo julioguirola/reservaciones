@@ -17,6 +17,7 @@ class Persona extends Model
   public string $nombre;
   public string $carnet_identidad;
   public $timestamps = false;
+  protected $fillable = ['nombre', 'carnet_identidad'];
   /**
    * @return HasOne<Chofer,Persona>
    */

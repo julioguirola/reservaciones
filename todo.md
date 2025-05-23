@@ -1,0 +1,6 @@
+- Agregar profesor al viaje
+- Editar chofer y fecha del viaje
+- Implementar toast en los eliminar, editar y crear
+- Mostrar informacion especifica del viaje
+- Mostrar errores de validacion
+- ortografia y traducir

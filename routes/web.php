@@ -3,7 +3,9 @@
 use App\Http\Controllers\ViajesController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ViajesController::class, 'renderViajes'])
+Route::get('/', function () {
+  return redirect()->intended(route('viajes'));
+})
   ->middleware(['auth', 'verified'])
   ->name('home');
 

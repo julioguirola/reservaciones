@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Database\UniqueConstraintViolationException;
 use stdClass;
 
 class ChoferesController extends Controller
@@ -40,7 +41,7 @@ class ChoferesController extends Controller
       ->join('persona', 'chofer.persona_id', '=', 'persona.id')
       ->where('chofer.deleted_at', null)
       ->where('chofer.id', $chofer_id)
-      ->get();
+      ->get()[0];
   }
 
   public static function renderChoferes(): Response
@@ -86,8 +87,50 @@ class ChoferesController extends Controller
   {
     return DB::table('viaje')->select('viaje.id', 'viaje.fecha')->where('chofer_id', $chofer_id)->get();
   }
-  public static function crearProfesor(Request $request)
+  public static function crearChofer(Request $request)
   {
-    // $nuevo_profesor = new ;
+    $data = $request->all();
+    $validator = Validator::make($data, [
+      'nombre' => 'min:5|max:30|required',
+      'carnet_identidad' => 'digits:11|required',
+      'licencia_numero' => 'digits:10|numeric',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+
+    try {
+      $persona = Persona::create([
+        'nombre' => $data['nombre'],
+        'carnet_identidad' => $data['carnet_identidad'],
+      ]);
+      $chofer = Chofer::create([
+        'persona_id' => $persona->id,
+        'licencia_numero' => $data['licencia_numero'],
+      ]);
+    } catch (UniqueConstraintViolationException $e) {
+      $errors = [];
+      if (str_contains($e->errorInfo[2], 'persona.carnet_identidad')) {
+        $errors['carnet_identidad'] = ['unique.constraint'];
+      }
+      if (str_contains($e->errorInfo[2], 'chofer.licencia_numero')) {
+        $errors['licencia_numero'] = ['unique.constraint'];
+      }
+
+      return response()->json(
+        [
+          'errors' => $errors,
+        ],
+        422,
+      );
+    }
+
+    return ['chofer' => self::getChofer($chofer->id)];
   }
 }

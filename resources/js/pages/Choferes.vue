@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CrearChoferDialog from '@/components/CrearChoferDialog.vue';
 import EditChoferDialog from '@/components/EditChoferDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -38,6 +39,7 @@ async function deleteChofer(chofer_id: string) {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <CrearChoferDialog />
             <Table>
                 <TableCaption>Información de los choferes</TableCaption>
                 <TableHeader>

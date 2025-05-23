@@ -13,6 +13,7 @@ interface Viaje {
     fecha: string;
     destinos: string[];
     profesores_count: number;
+    recaudado: number;
 }
 
 const props = defineProps<{
@@ -40,6 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <CardContent class="flex items-center gap-1"><UserCog /> {{ viaje.chofer_nombre }} </CardContent>
                     <CardContent class="flex items-center gap-1"> <CalendarDays />{{ viaje.fecha.split(' ')[0] }}</CardContent>
                     <CardContent><DestinosViajes :destinos="viaje.destinos"></DestinosViajes></CardContent>
+                    <CardContent>Recaudado: $ {{ viaje.recaudado }}</CardContent>
                 </Card>
             </div>
         </div>
