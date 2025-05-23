@@ -16,6 +16,9 @@ import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
 import { ref, useTemplateRef } from 'vue';
 import InputError from './InputError.vue';
+import { useToast } from './ui/toast';
+
+const { toast } = useToast();
 const props = defineProps<{
     nombre: string;
     carnet_identidad: string;
@@ -55,6 +58,11 @@ const submit = async () => {
     } else {
         errors.value = {};
         hiddenCloseBtn.value?.click();
+        toast({
+            title: '✅ Operacion realizada',
+            description: 'Chofer modificado con exito',
+            duration: 1500,
+        });
         router.reload();
     }
 };

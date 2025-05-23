@@ -16,7 +16,6 @@ import { router } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import { ref, useTemplateRef } from 'vue';
 import InputError from './InputError.vue';
-import { Toaster } from './ui/toast';
 import { useToast } from './ui/toast/use-toast';
 
 const { toast } = useToast();
@@ -59,6 +58,7 @@ const submit = async () => {
         toast({
             title: '✅ Operacion realizada',
             description: 'Nuevo chofer registrado con exito',
+            duration: 1500,
         });
         router.reload();
     }
@@ -66,7 +66,6 @@ const submit = async () => {
 </script>
 
 <template>
-    <Toaster />
     <Dialog>
         <DialogTrigger as-child>
             <Button class="self-end" variant="outline">Registrar nuevo chofer <Plus /></Button>

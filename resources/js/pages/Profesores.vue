@@ -3,11 +3,14 @@ import CrearProfesorDialog from '@/components/CrearProfesorDialog.vue';
 import EditProfesorDialog from '@/components/EditProfesorDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { Trash } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
+
+const { toast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -36,6 +39,11 @@ const heads = ['Nombre', 'Carnet de Identidad', 'Origen', 'Facultad', 'Asignatur
 
 async function deleteProfesor(profesor_id: string) {
     await fetch(route('profesores.eliminar', { profesor_id }), { method: 'DELETE' });
+    toast({
+        title: '✅ Operacion realizada',
+        description: 'Profesor eliminado con exito',
+        duration: 1500,
+    });
     router.reload();
 }
 

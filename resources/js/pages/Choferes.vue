@@ -3,10 +3,13 @@ import CrearChoferDialog from '@/components/CrearChoferDialog.vue';
 import EditChoferDialog from '@/components/EditChoferDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { Trash } from 'lucide-vue-next';
+
+const { toast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,6 +33,11 @@ const props = defineProps<{
 
 async function deleteChofer(chofer_id: string) {
     await fetch(route('choferes.eliminar', { chofer_id }), { method: 'DELETE' });
+    toast({
+        title: '✅ Operacion realizada',
+        description: 'Chofer eliminado con exito',
+        duration: 1500,
+    });
     router.reload();
 }
 </script>

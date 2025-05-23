@@ -13,9 +13,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import InputError from './InputError.vue';
+import { useToast } from './ui/toast';
+
+const { toast } = useToast();
 
 interface ProfesorCampos {
     id?: number;
@@ -46,6 +50,8 @@ const errors = ref<{
     nombre?: string[];
 }>({});
 
+const hiddenCloseBtn = useTemplateRef<HTMLButtonElement | null>('hiddenCloseBtn');
+
 const submit = async () => {
     const res = await fetch(route('profesores.editar', props.profesor_id), {
         method: 'PUT',
@@ -64,6 +70,15 @@ const submit = async () => {
     const data = await res.json();
     if (data.errors) {
         errors.value = data.errors;
+    } else {
+        errors.value = {};
+        hiddenCloseBtn.value?.click();
+        toast({
+            title: '✅ Operacion realizada',
+            description: 'Profesor modificado con exito',
+            duration: 1500,
+        });
+        router.reload();
     }
 };
 </script>
@@ -140,6 +155,9 @@ const submit = async () => {
                 ><DialogClose> <Button variant="outline"> Cancelar </Button></DialogClose>
 
                 <Button @click="submit"> Guardar Cambios</Button>
+                <DialogClose as-child>
+                    <button ref="hiddenCloseBtn" style="display: none"></button>
+                </DialogClose>
             </DialogFooter>
         </DialogContent>
     </Dialog>
