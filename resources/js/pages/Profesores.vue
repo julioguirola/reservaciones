@@ -2,13 +2,14 @@
 import CrearProfesorDialog from '@/components/CrearProfesorDialog.vue';
 import EditProfesorDialog from '@/components/EditProfesorDialog.vue';
 import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { Trash } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const { toast } = useToast();
 
@@ -33,6 +34,7 @@ interface Profesor {
 }
 const props = defineProps<{
     profesores: Profesor[];
+    profesores_cant: number;
 }>();
 
 const heads = ['Nombre', 'Carnet de Identidad', 'Origen', 'Facultad', 'Asignatura'];
@@ -44,7 +46,7 @@ async function deleteProfesor(profesor_id: string) {
         description: 'Profesor eliminado con éxito',
         duration: 1500,
     });
-    router.reload();
+    change_page();
 }
 
 interface ProfesorCampos {
@@ -55,6 +57,21 @@ interface ProfesorCampos {
 const destinos = ref<ProfesorCampos[]>([]);
 const asignaturas = ref<ProfesorCampos[]>([]);
 const facultades = ref<ProfesorCampos[]>([]);
+
+const profesores = ref<Profesor[]>(props.profesores);
+const actual_page = ref<number>(0);
+const profesores_cant = ref<number>(props.profesores_cant);
+
+const change_page = async () => {
+    const res = await fetch(route('profesores.data') + `?page=${actual_page.value - 1}`);
+    const data = await res.json();
+    profesores.value = data.profesores;
+    profesores_cant.value = data.profesores_cant;
+};
+
+watch(actual_page, async () => {
+    change_page();
+});
 
 onMounted(async () => {
     let res = await fetch(route('destinos.data'));
@@ -81,7 +98,7 @@ onMounted(async () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="profesor in props.profesores" :key="profesor.id">
+                    <TableRow v-for="profesor in profesores" :key="profesor.id">
                         <TableCell class="font-medium">
                             {{ profesor.nombre }}
                         </TableCell>
@@ -107,6 +124,21 @@ onMounted(async () => {
                     </TableRow>
                 </TableBody>
             </Table>
+            <Pagination v-model:page="actual_page" v-slot="{ page }" :items-per-page="5" :total="profesores_cant" :default-page="1">
+                <PaginationContent v-slot="{ items }">
+                    <PaginationPrevious></PaginationPrevious>
+
+                    <template v-for="(item, index) in items" :key="index">
+                        <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
+                            {{ item.value }}
+                        </PaginationItem>
+                    </template>
+
+                    <PaginationEllipsis :index="4" />
+
+                    <PaginationNext />
+                </PaginationContent>
+            </Pagination>
         </div>
     </AppLayout>
 </template>

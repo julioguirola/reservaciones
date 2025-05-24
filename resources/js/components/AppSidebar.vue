@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    useSidebar,
+} from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Bus, MapPin, UserCog, UserPen } from 'lucide-vue-next';
-import AppLogo from './AppLogo.vue';
+import { Bus, BusFront, MapPin, UserCog, UserPen } from 'lucide-vue-next';
+const { state } = useSidebar();
 
 const mainNavItems: NavItem[] = [
     {
@@ -49,9 +58,10 @@ const mainNavItems: NavItem[] = [
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton size="lg" as-child>
+                    <SidebarMenuButton size="lg" as-child class="flex justify-center">
                         <Link :href="route('viajes')">
-                            <AppLogo />
+                            <component :is="BusFront" />
+                            <span class="mb-0.5 truncate font-semibold leading-none" v-if="state === 'expanded'">Reservaciones</span>
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 import InputError from './InputError.vue';
 import { useToast } from './ui/toast';
 
@@ -50,7 +50,7 @@ const errors = ref<{
     nombre?: string[];
 }>({});
 
-const hiddenCloseBtn = useTemplateRef<HTMLButtonElement | null>('hiddenCloseBtn');
+const isOpen = ref(false);
 
 const submit = async () => {
     const res = await fetch(route('profesores.editar', props.profesor_id), {
@@ -72,7 +72,7 @@ const submit = async () => {
         errors.value = data.errors;
     } else {
         errors.value = {};
-        hiddenCloseBtn.value?.click();
+        isOpen.value = false;
         toast({
             title: '✅ Operación realizada',
             description: 'Profesor modificado con éxito',
@@ -84,7 +84,7 @@ const submit = async () => {
 </script>
 
 <template>
-    <Dialog>
+    <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
             <Button class="bg-green-600"> <Pencil /> </Button>
         </DialogTrigger>

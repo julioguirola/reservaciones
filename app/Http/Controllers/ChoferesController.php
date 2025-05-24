@@ -18,20 +18,27 @@ class ChoferesController extends Controller
   /**
    * @return Collection<int,stdClass>
    */
-  public static function getChoferes()
+  public static function getChoferes(Request $request)
   {
     $choferes = DB::table('chofer')
       ->select('chofer.id', 'persona.id as persona_id', 'persona.nombre', 'persona.carnet_identidad', 'chofer.licencia_numero')
       ->join('persona', 'chofer.persona_id', '=', 'persona.id')
       ->where('chofer.deleted_at', null)
+      ->offset($request->query('page', 0) * 5)
+      ->limit(5)
       ->get()
       ->all();
 
-    return array_map(function ($chofer) {
+    $choferes_viajes = array_map(function ($chofer) {
       $cant_viajes = DB::table('viaje')->where('chofer_id', $chofer->id)->count();
       $chofer->cant_viajes = $cant_viajes;
       return $chofer;
     }, $choferes);
+
+    return [
+      'choferes' => $choferes_viajes,
+      'choferes_cant' => Chofer::count(),
+    ];
   }
 
   public static function getChofer(string $chofer_id)
@@ -44,9 +51,9 @@ class ChoferesController extends Controller
       ->get()[0];
   }
 
-  public static function renderChoferes(): Response
+  public static function renderChoferes(Request $request): Response
   {
-    return Inertia::render('Choferes', ['choferes' => self::getChoferes()]);
+    return Inertia::render('Choferes', ['choferes' => self::getChoferes($request)['choferes'], 'choferes_cant' => Chofer::count()]);
   }
   public static function deleteChofer(string $chofer_id): Chofer
   {

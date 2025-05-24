@@ -2,12 +2,14 @@
 import CrearChoferDialog from '@/components/CrearChoferDialog.vue';
 import EditChoferDialog from '@/components/EditChoferDialog.vue';
 import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { Trash } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
 
 const { toast } = useToast();
 
@@ -29,6 +31,7 @@ interface Chofer {
 
 const props = defineProps<{
     choferes: Chofer[];
+    choferes_cant: number;
 }>();
 
 async function deleteChofer(chofer_id: string) {
@@ -38,8 +41,23 @@ async function deleteChofer(chofer_id: string) {
         description: 'Chofer eliminado con exito',
         duration: 1500,
     });
-    router.reload();
+    change_page();
 }
+
+const actual_page = ref<number>(0);
+const choferes = ref<Chofer[]>(props.choferes);
+const choferes_cant = ref<number>(props.choferes_cant);
+
+const change_page = async () => {
+    const res = await fetch(route('choferes.data') + `?page=${actual_page.value - 1}`);
+    const data = await res.json();
+    choferes.value = data.choferes;
+    choferes_cant.value = data.choferes_cant;
+};
+
+watch(actual_page, async () => {
+    change_page();
+});
 </script>
 
 <template>
@@ -60,7 +78,7 @@ async function deleteChofer(chofer_id: string) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="chofer in props.choferes" :key="chofer.id">
+                    <TableRow v-for="chofer in choferes" :key="chofer.id">
                         <TableCell class="font-medium">
                             {{ chofer.nombre }}
                         </TableCell>
@@ -80,6 +98,21 @@ async function deleteChofer(chofer_id: string) {
                     </TableRow>
                 </TableBody>
             </Table>
+            <Pagination v-model:page="actual_page" v-slot="{ page }" :items-per-page="5" :total="choferes_cant" :default-page="1">
+                <PaginationContent v-slot="{ items }">
+                    <PaginationPrevious></PaginationPrevious>
+
+                    <template v-for="(item, index) in items" :key="index">
+                        <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
+                            {{ item.value }}
+                        </PaginationItem>
+                    </template>
+
+                    <PaginationEllipsis :index="4" />
+
+                    <PaginationNext />
+                </PaginationContent>
+            </Pagination>
         </div>
     </AppLayout>
 </template>

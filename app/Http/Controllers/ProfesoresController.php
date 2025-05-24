@@ -21,9 +21,9 @@ class ProfesoresController extends Controller
   /**
    * @return Collection<int,stdClass>
    */
-  public static function getProfesores(): Collection
+  public static function getProfesores(Request $request)
   {
-    return DB::table('profesor')
+    $query = DB::table('profesor')
       ->select(
         'profesor.id',
         'persona.id as persona_id',
@@ -41,11 +41,16 @@ class ProfesoresController extends Controller
       ->join('facultad', 'profesor.facultad_id', '=', 'facultad.id')
       ->join('asignatura', 'profesor.asignatura_id', '=', 'asignatura.id')
       ->where('profesor.deleted_at', null)
-      ->get();
+      ->offset($request->query('page', 0) * 5)
+      ->limit(5);
+    return ['profesores' => $query->get(), 'profesores_cant' => Profesor::count()];
   }
-  public static function renderProfesores(): Response
+  public static function renderProfesores(Request $request): Response
   {
-    return Inertia::render('Profesores', ['profesores' => self::getProfesores()]);
+    return Inertia::render('Profesores', [
+      'profesores' => self::getProfesores($request)['profesores'],
+      'profesores_cant' => Profesor::count(),
+    ]);
   }
   public static function deleteProfesor(string $profesor_id): Profesor
   {

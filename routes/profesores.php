@@ -6,6 +6,9 @@ Route::prefix('profesores')
   ->name('profesores')
   ->group(function () {
     Route::get('/', [ProfesoresController::class, 'renderProfesores'])->middleware(['auth', 'verified']);
+    Route::get('/data', [ProfesoresController::class, 'getProfesores'])
+      ->middleware(['auth', 'verified'])
+      ->name('.data');
     Route::delete('/{profesor_id}', [ProfesoresController::class, 'deleteProfesor'])
       ->middleware(['auth', 'verified'])
       ->name('.eliminar');

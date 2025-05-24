@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Collection;
+use App\Models\Viaje;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -13,12 +14,14 @@ class ViajesController extends Controller
   /**
    * @return array<int,stdClass>
    */
-  public static function getViajes()
+  public static function getViajes(Request $request)
   {
     $viajes = DB::table('viaje')
       ->select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
       ->join('chofer', 'chofer.id', '=', 'viaje.chofer_id')
       ->join('persona', 'persona.id', '=', 'chofer.persona_id')
+      ->offset($request->query('page', 0) * 8)
+      ->limit(8)
       ->get()
       ->all();
 
@@ -45,12 +48,12 @@ class ViajesController extends Controller
       return $viaje;
     }, $viajes);
 
-    return $viajes_destinos;
+    return ['viajes' => $viajes_destinos, 'viajes_cant' => Viaje::count()];
   }
 
-  public function renderViajes(): Response
+  public function renderViajes(Request $request): Response
   {
-    return Inertia::render('Viajes', ['viajes' => self::getViajes()]);
+    return Inertia::render('Viajes', ['viajes' => self::getViajes($request)['viajes'], 'viajes_cant' => Viaje::count()]);
   }
 
   public static function getProfesoresViaje(int $viaje_id)

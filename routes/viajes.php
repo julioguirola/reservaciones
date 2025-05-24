@@ -6,6 +6,9 @@ Route::prefix('viajes')
   ->name('viajes')
   ->group(function () {
     Route::get('/', [ViajesController::class, 'renderViajes'])->middleware(['auth', 'verified']);
+    Route::get('/data', [ViajesController::class, 'getViajes'])
+      ->middleware(['auth', 'verified'])
+      ->name('.data');
     Route::get('/{viaje_id}', [ViajesController::class, 'infoViaje'])
       ->middleware(['auth', 'verified'])
       ->name('.info');

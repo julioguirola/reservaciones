@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 import InputError from './InputError.vue';
 import { useToast } from './ui/toast';
 
@@ -29,8 +29,9 @@ const errors = ref<{
     precio?: string[];
 }>({});
 
+const isOpen = ref(false);
+
 const precio = ref(props.precio);
-const hiddenCloseBtn = useTemplateRef<HTMLButtonElement | null>('hiddenCloseBtn');
 
 const submit = async () => {
     const res = await fetch(route('destinos.editar', props.destino_id), {
@@ -46,7 +47,7 @@ const submit = async () => {
     if (data.errors) {
         errors.value = {};
     } else {
-        hiddenCloseBtn.value?.click();
+        isOpen.value = false;
         toast({
             title: '✅ Operación realizada',
             description: 'Destino modificado con éxito',
@@ -58,7 +59,7 @@ const submit = async () => {
 </script>
 
 <template>
-    <Dialog>
+    <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
             <Button class="bg-green-600"> <Pencil /> </Button>
         </DialogTrigger>
@@ -78,9 +79,6 @@ const submit = async () => {
                 ><DialogClose> <Button variant="outline"> Cancelar </Button></DialogClose>
 
                 <Button @click="submit"> Guardar Cambios </Button>
-                <DialogClose as-child>
-                    <button ref="hiddenCloseBtn" style="display: none"></button>
-                </DialogClose>
             </DialogFooter>
         </DialogContent>
     </Dialog>

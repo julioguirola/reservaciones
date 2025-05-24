@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { router } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 import InputError from './InputError.vue';
 import { useToast } from './ui/toast/use-toast';
 
@@ -26,7 +26,7 @@ const errors = ref<{
     licencia_numero?: string[];
 }>({});
 
-const hiddenCloseBtn = useTemplateRef<HTMLButtonElement | null>('hiddenCloseBtn');
+const isOpen = ref(false);
 
 const nombre = ref('');
 const carnet_identidad = ref('');
@@ -51,7 +51,7 @@ const submit = async () => {
         errors.value = data.errors;
     } else {
         errors.value = {};
-        hiddenCloseBtn.value?.click();
+        isOpen.value = false;
         nombre.value = '';
         licencia_numero.value = '';
         carnet_identidad.value = '';
@@ -66,7 +66,7 @@ const submit = async () => {
 </script>
 
 <template>
-    <Dialog>
+    <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
             <Button class="self-end" variant="outline">Registrar nuevo chofer <Plus /></Button>
         </DialogTrigger>

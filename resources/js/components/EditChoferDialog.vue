@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 import InputError from './InputError.vue';
 import { useToast } from './ui/toast';
 
@@ -37,7 +37,7 @@ const nombre = ref(props.nombre);
 const carnet_identidad = ref(props.carnet_identidad);
 const licencia_numero = ref(props.licencia_numero);
 
-const hiddenCloseBtn = useTemplateRef<HTMLButtonElement | null>('hiddenCloseBtn');
+const isOpen = ref(false);
 
 const submit = async () => {
     const res = await fetch(route('choferes.editar', props.chofer_id), {
@@ -56,8 +56,8 @@ const submit = async () => {
     if (data.errors) {
         errors.value = data.errors;
     } else {
+        isOpen.value = false;
         errors.value = {};
-        hiddenCloseBtn.value?.click();
         toast({
             title: '✅ Operación realizada',
             description: 'Chofer modificado con éxito',
@@ -69,7 +69,7 @@ const submit = async () => {
 </script>
 
 <template>
-    <Dialog>
+    <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
             <Button class="bg-green-600"> <Pencil /> </Button>
         </DialogTrigger>
