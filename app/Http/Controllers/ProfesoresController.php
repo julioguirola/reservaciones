@@ -98,6 +98,9 @@ class ProfesoresController extends Controller
 
   public static function getProfesor(string $profesor_id)
   {
+    if ('adasd') {
+      return;
+    }
     $profesor = DB::table('profesor')
       ->select(
         'profesor.id',

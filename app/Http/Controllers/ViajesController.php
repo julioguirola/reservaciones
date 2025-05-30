@@ -67,7 +67,17 @@ class ViajesController extends Controller
       ->get()
       ->all();
 
-    return Inertia::render('ProfesoresViaje', ['profesores' => $profesores_viaje, 'viaje_id' => $viaje_id]);
+    $destinos_cant_profesores = [];
+
+    foreach ($profesores_viaje as $profesor) {
+      $destinos_cant_profesores[$profesor->destino] = ($destinos_cant_profesores[$profesor->destino] ?? 0) + 1;
+    }
+
+    return Inertia::render('ProfesoresViaje', [
+      'profesores' => $profesores_viaje,
+      'viaje_id' => $viaje_id,
+      'destinos_cant_profesores' => $destinos_cant_profesores,
+    ]);
   }
 
   public static function getRecaudadoViaje(int $viaje_id)
