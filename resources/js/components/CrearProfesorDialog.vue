@@ -13,7 +13,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { router } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from './InputError.vue';
@@ -38,6 +37,7 @@ const props = defineProps<{
     destinos: ProfesorCampos[];
     asignaturas: ProfesorCampos[];
     facultades: ProfesorCampos[];
+    change_page: () => void;
 }>();
 
 const isOpen = ref(false);
@@ -80,7 +80,7 @@ const submit = async () => {
             description: 'Nuevo profesor registrado con éxito',
             duration: 1500,
         });
-        router.reload();
+        props.change_page();
     }
 };
 </script>

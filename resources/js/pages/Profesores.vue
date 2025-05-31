@@ -88,7 +88,7 @@ onMounted(async () => {
     <Head title="Profesores" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <CrearProfesorDialog :destinos="destinos" :facultades="facultades" :asignaturas="asignaturas" />
+            <CrearProfesorDialog :destinos="destinos" :facultades="facultades" :asignaturas="asignaturas" :change_page="change_page" />
             <Table>
                 <TableCaption>Informacion de los profesores</TableCaption>
                 <TableHeader>
@@ -118,6 +118,7 @@ onMounted(async () => {
                                 :destinos="destinos"
                                 :facultades="facultades"
                                 :asignaturas="asignaturas"
+                                :change_page="change_page"
                             />
                             <Button @click="deleteProfesor(profesor.id)" class="bg-red-600"><Trash></Trash></Button>
                         </TableCell>

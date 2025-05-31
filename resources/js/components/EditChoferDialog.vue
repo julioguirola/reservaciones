@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from './InputError.vue';
@@ -25,6 +24,7 @@ const props = defineProps<{
     licencia_numero: string;
     persona_id: string;
     chofer_id: string;
+    change_page: () => void;
 }>();
 
 const errors = ref<{
@@ -63,7 +63,7 @@ const submit = async () => {
             description: 'Chofer modificado con éxito',
             duration: 1500,
         });
-        router.reload();
+        props.change_page();
     }
 };
 </script>
@@ -100,9 +100,6 @@ const submit = async () => {
                 ><DialogClose> <Button variant="outline"> Cancelar </Button></DialogClose>
 
                 <Button @click="submit"> Guardar Cambios</Button>
-                <DialogClose as-child>
-                    <button ref="hiddenCloseBtn" style="display: none"></button>
-                </DialogClose>
             </DialogFooter>
         </DialogContent>
     </Dialog>

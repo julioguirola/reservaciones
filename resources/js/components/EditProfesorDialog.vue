@@ -13,7 +13,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from './InputError.vue';
@@ -37,6 +36,7 @@ const props = defineProps<{
     destinos: ProfesorCampos[];
     asignaturas: ProfesorCampos[];
     facultades: ProfesorCampos[];
+    change_page: () => void;
 }>();
 
 const nombre = ref(props.nombre);
@@ -78,7 +78,7 @@ const submit = async () => {
             description: 'Profesor modificado con éxito',
             duration: 1500,
         });
-        router.reload();
+        props.change_page();
     }
 };
 </script>
@@ -155,9 +155,6 @@ const submit = async () => {
                 ><DialogClose> <Button variant="outline"> Cancelar </Button></DialogClose>
 
                 <Button @click="submit"> Guardar Cambios</Button>
-                <DialogClose as-child>
-                    <button ref="hiddenCloseBtn" style="display: none"></button>
-                </DialogClose>
             </DialogFooter>
         </DialogContent>
     </Dialog>

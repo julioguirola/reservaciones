@@ -65,7 +65,7 @@ watch(actual_page, async () => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <CrearChoferDialog />
+            <CrearChoferDialog :change_page="change_page" />
             <Table>
                 <TableCaption>Información de los choferes</TableCaption>
                 <TableHeader>
@@ -92,6 +92,7 @@ watch(actual_page, async () => {
                                 :persona_id="chofer.persona_id"
                                 :chofer_id="chofer.id"
                                 :carnet_identidad="chofer.carnet_identidad"
+                                :change_page="change_page"
                             />
                             <Button class="bg-red-600" @click="deleteChofer(chofer.id)"><Trash></Trash></Button>
                         </TableCell>

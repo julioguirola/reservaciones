@@ -12,13 +12,16 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { router } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from './InputError.vue';
 import { useToast } from './ui/toast/use-toast';
 
 const { toast } = useToast();
+
+const props = defineProps<{
+    change_page: () => void;
+}>();
 
 const errors = ref<{
     carnet_identidad?: string[];
@@ -60,7 +63,7 @@ const submit = async () => {
             description: 'Nuevo chofer registrado con éxito',
             duration: 1500,
         });
-        router.reload();
+        props.change_page();
     }
 };
 </script>
