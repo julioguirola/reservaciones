@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import CrearChoferDialog from '@/components/CrearChoferDialog.vue';
 import EditChoferDialog from '@/components/EditChoferDialog.vue';
-import { Button } from '@/components/ui/button';
+import EliminarPersonaDialog from '@/components/EliminarPersonaDialog.vue';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { Trash } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
-
-const { toast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,16 +29,6 @@ const props = defineProps<{
     choferes: Chofer[];
     choferes_cant: number;
 }>();
-
-async function deleteChofer(chofer_id: string) {
-    await fetch(route('choferes.eliminar', { chofer_id }), { method: 'DELETE' });
-    toast({
-        title: '✅ Operacion realizada',
-        description: 'Chofer eliminado con exito',
-        duration: 1500,
-    });
-    change_page();
-}
 
 const actual_page = ref<number>(0);
 const choferes = ref<Chofer[]>(props.choferes);
@@ -94,7 +80,7 @@ watch(actual_page, async () => {
                                 :carnet_identidad="chofer.carnet_identidad"
                                 :change_page="change_page"
                             />
-                            <Button class="bg-red-600" @click="deleteChofer(chofer.id)"><Trash></Trash></Button>
+                            <EliminarPersonaDialog :persona_cargo_id="chofer.id" :change_page="change_page" persona_cargo="chofer" />
                         </TableCell>
                     </TableRow>
                 </TableBody>

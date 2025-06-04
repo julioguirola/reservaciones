@@ -15,4 +15,7 @@ Route::prefix('viajes')
     Route::get('/{viaje_id}/profesores', [ViajesController::class, 'getProfesoresViaje'])
       ->middleware(['auth', 'verified'])
       ->name('.profesores');
+    Route::delete('/{viaje_id}/profesores', [ViajesController::class, 'removeProfesorViaje'])
+      ->middleware(['auth', 'verified'])
+      ->name('.removeProfesor');
   });

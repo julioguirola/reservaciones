@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import CrearProfesorDialog from '@/components/CrearProfesorDialog.vue';
 import EditProfesorDialog from '@/components/EditProfesorDialog.vue';
-import { Button } from '@/components/ui/button';
+import EliminarPersonaDialog from '@/components/EliminarPersonaDialog.vue';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { Trash } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-
-const { toast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,16 +34,6 @@ const props = defineProps<{
 }>();
 
 const heads = ['Nombre', 'Carnet de Identidad', 'Origen', 'Facultad', 'Asignatura'];
-
-async function deleteProfesor(profesor_id: string) {
-    await fetch(route('profesores.eliminar', { profesor_id }), { method: 'DELETE' });
-    toast({
-        title: '✅ Operación realizada',
-        description: 'Profesor eliminado con éxito',
-        duration: 1500,
-    });
-    change_page();
-}
 
 interface ProfesorCampos {
     id?: number;
@@ -120,7 +106,7 @@ onMounted(async () => {
                                 :asignaturas="asignaturas"
                                 :change_page="change_page"
                             />
-                            <Button @click="deleteProfesor(profesor.id)" class="bg-red-600"><Trash></Trash></Button>
+                            <EliminarPersonaDialog :persona_cargo_id="profesor.id" :change_page="change_page" persona_cargo="profesor" />
                         </TableCell>
                     </TableRow>
                 </TableBody>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import AddProfesorViaje from '@/components/AddProfesorViaje.vue';
+import DesvincularProfesorViaje from '@/components/DesvincularProfesorViaje.vue';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
-
-const { toast } = useToast();
 
 interface Profesor {
     id: string;
@@ -23,6 +22,7 @@ interface Profesor {
 const props = defineProps<{
     profesores: Profesor[];
     viaje_id: number;
+    realizado: boolean;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -33,17 +33,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const heads = ['Nombre', 'Destino', 'Acciones'];
-
-// async function deleteProfesorDelViaje(profesor_id: string) {
-//     // await fetch(route('profesores.eliminar', { profesor_id }), { method: 'DELETE' });
-//     return;
-//     toast({
-//         title: '✅ Operacion realizada',
-//         description: 'Profesor eliminado con exito',
-//         duration: 1500,
-//     });
-//     router.reload();
-// }
 
 interface ProfesorCampos {
     id?: number;
@@ -69,8 +58,10 @@ onMounted(async () => {
     <Head :title="`Profesores del viaje ${props.viaje_id}`" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <p v-if="props.realizado" class="self-center">No se pueden desvincular o asignar profesores a un viaje realizado.</p>
+            <AddProfesorViaje v-else :viaje_id="props.viaje_id" />
             <Table>
-                <TableCaption>Informacion de los profesores</TableCaption>
+                <TableCaption>Información de los profesores</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead v-for="(head, i) in heads" :key="i"> {{ head }} </TableHead>
@@ -82,6 +73,9 @@ onMounted(async () => {
                             {{ profesor.nombre }}
                         </TableCell>
                         <TableCell> {{ profesor.destino }} </TableCell>
+                        <TableCell
+                            ><DesvincularProfesorViaje :viaje_id="props.viaje_id" :profesor_id="profesor.id" :viaje_realizado="realizado"
+                        /></TableCell>
                     </TableRow>
                 </TableBody>
             </Table>

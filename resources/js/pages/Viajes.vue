@@ -16,6 +16,7 @@ interface Viaje {
     destinos: string[];
     profesores_count: number;
     recaudado: number;
+    realizado: boolean;
 }
 
 const props = defineProps<{

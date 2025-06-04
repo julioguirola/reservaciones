@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Viaje;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -44,7 +45,10 @@ class ViajesController extends Controller
       }, $destinos);
       $viaje->profesores_count = $profesores_count;
       $viaje->recaudado = $recaudado;
-
+      $realizado = Carbon::now()->greaterThan($viaje->fecha);
+      if ($realizado) {
+        $viaje->realizado = true;
+      }
       return $viaje;
     }, $viajes);
 
@@ -56,28 +60,53 @@ class ViajesController extends Controller
     return Inertia::render('Viajes', ['viajes' => self::getViajes($request)['viajes'], 'viajes_cant' => Viaje::count()]);
   }
 
-  public static function getProfesoresViaje(int $viaje_id)
+  public static function getProfesoresViaje(int $viaje_id, Request $request)
   {
-    $profesores_viaje = DB::table('profesor_viaje')
-      ->select('profesor_viaje.profesor_id', 'persona.id as persona_id', 'persona.nombre', 'destino.nombre as destino', 'destino.precio as tarifa')
-      ->where('profesor_viaje.viaje_id', $viaje_id)
-      ->join('persona', 'profesor.persona_id', '=', 'persona.id')
-      ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
-      ->join('destino', 'profesor.destino_id', '=', 'destino.id')
-      ->get()
-      ->all();
+    if ($request->query('not_in_viaje')) {
+      $profesores_not_viaje = DB::table('profesor as p')
+        ->join('persona as per', 'p.persona_id', '=', 'per.id')
+        ->join('destino as d', 'p.destino_id', '=', 'd.id')
+        ->whereNotIn('p.id', function ($query) use ($viaje_id) {
+          $query->select('pv.profesor_id')->from('profesor_viaje as pv')->where('pv.viaje_id', $viaje_id);
+        })
+        ->orderBy('p.id')
+        ->select(['per.id as persona_id', 'per.nombre', 'per.carnet_identidad', 'd.nombre as destino'])
+        ->get()
+        ->all();
 
-    $destinos_cant_profesores = [];
+      return ['profesores_not_viaje' => $profesores_not_viaje];
+    } else {
+      $profesores_viaje = DB::table('profesor_viaje')
+        ->select(
+          'profesor_viaje.profesor_id as id',
+          'persona.id as persona_id',
+          'persona.nombre',
+          'destino.nombre as destino',
+          'destino.precio as tarifa',
+        )
+        ->where('profesor_viaje.viaje_id', $viaje_id)
+        ->join('persona', 'profesor.persona_id', '=', 'persona.id')
+        ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
+        ->join('destino', 'profesor.destino_id', '=', 'destino.id')
+        ->get()
+        ->all();
 
-    foreach ($profesores_viaje as $profesor) {
-      $destinos_cant_profesores[$profesor->destino] = ($destinos_cant_profesores[$profesor->destino] ?? 0) + 1;
+      $destinos_cant_profesores = [];
+
+      foreach ($profesores_viaje as $profesor) {
+        $destinos_cant_profesores[$profesor->destino] = ($destinos_cant_profesores[$profesor->destino] ?? 0) + 1;
+      }
+
+      $viaje = DB::table('viaje')->where('id', $viaje_id)->first();
+      $realizado = Carbon::now()->greaterThan($viaje->fecha);
+
+      return Inertia::render('ProfesoresViaje', [
+        'profesores' => $profesores_viaje,
+        'viaje_id' => $viaje_id,
+        'destinos_cant_profesores' => $destinos_cant_profesores,
+        'realizado' => $realizado,
+      ]);
     }
-
-    return Inertia::render('ProfesoresViaje', [
-      'profesores' => $profesores_viaje,
-      'viaje_id' => $viaje_id,
-      'destinos_cant_profesores' => $destinos_cant_profesores,
-    ]);
   }
 
   public static function getRecaudadoViaje(int $viaje_id)
@@ -100,4 +129,21 @@ class ViajesController extends Controller
     ]);
   }
   public static function changeChoferViaje(Request $request, string $viaje_id) {}
+
+  public static function removeProfesorViaje(Request $request, string $viaje_id)
+  {
+    $viaje = DB::table('viaje')->where('id', $viaje_id)->first();
+    $ocurrido = Carbon::now()->greaterThan($viaje->fecha);
+    if ($ocurrido) {
+      return response()->json(['error' => 'No se puede eliminar un profesor de un viaje que ya ha ocurrido'], 400);
+    }
+    $data = $request->all();
+    $deleted = DB::table('profesor_viaje')->where('profesor_id', $data['profesor_id'])->where('viaje_id', $viaje_id)->delete();
+
+    if ($deleted) {
+      return response()->json(['message' => 'Profesor eliminado del viaje'], 200);
+    } else {
+      return response()->json(['error' => 'Error al eliminar el profesor del viaje'], 500);
+    }
+  }
 }

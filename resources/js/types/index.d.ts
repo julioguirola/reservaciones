@@ -36,4 +36,40 @@ export interface User {
     updated_at: string;
 }
 
+interface ProfesorCampos {
+    id?: number;
+    nombre?: string;
+}
+
+interface Profesor {
+    id: string;
+    persona_id: string;
+    nombre: string;
+    carnet_identidad: string;
+    destino: string;
+    facultad: string;
+    asignatura: string;
+    destino_id: number;
+    facultad_id: number;
+    asignatura_id: number;
+}
+
+interface Chofer {
+    id: string;
+    persona_id: string;
+    licencia_numero: string;
+    carnet_identidad: string;
+    nombre: string;
+    cant_viajes: number;
+}
+
+interface Viaje {
+    id: number;
+    chofer_nombre: string;
+    fecha: string;
+    destinos: string[];
+    profesores_count: number;
+    recaudado: number;
+    realizado: boolean;
+}
 export type BreadcrumbItemType = BreadcrumbItem;
