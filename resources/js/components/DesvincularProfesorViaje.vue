@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { router } from '@inertiajs/vue3';
+import { ListMinus } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { toast } from './ui/toast';
 
@@ -51,7 +52,7 @@ const isOpen = ref(false);
 <template>
     <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
-            <Button variant="outline" :disabled="props.viaje_realizado">Desvincular</Button>
+            <Button variant="outline" :disabled="props.viaje_realizado"><ListMinus />Desvincular</Button>
         </DialogTrigger>
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>

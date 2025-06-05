@@ -11,11 +11,11 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus } from 'lucide-vue-next';
-// import { toast } from './ui/toast';
 import { type Profesor } from '@/types';
+import { router } from '@inertiajs/vue3';
+import { Plus } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
-
+import { toast } from './ui/toast';
 const props = defineProps<{
     viaje_id: number;
 }>();
@@ -30,15 +30,38 @@ onMounted(async () => {
     profesores_not.value = data.profesores_not_viaje;
 });
 
-// const addProfesorViaje = async (profesor_id: string) => {
-//     const data = await fetch(route())
-// }
+const addProfesorViaje = async (profesor_id: string) => {
+    const res = await fetch(route('viajes.addProfesor', { viaje_id: props.viaje_id }), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            profesor_id: profesor_id,
+        }),
+    });
+    const data = await res.json();
+    if (data.error) {
+        toast({
+            title: 'Error',
+            duration: 1500,
+        });
+    } else {
+        toast({
+            title: '✅ Operación realizada',
+            description: 'Profesor agregado al viaje con éxito',
+            duration: 1500,
+        });
+        isOpen.value = false;
+        router.reload();
+    }
+};
 </script>
 
 <template>
     <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
-            <Button variant="outline" class="self-end">Asignar profesor</Button>
+            <Button variant="outline">Asignar profesor</Button>
         </DialogTrigger>
         <DialogContent class="h-[90vh] sm:max-w-[750px]">
             <DialogHeader>
@@ -59,7 +82,7 @@ onMounted(async () => {
                         <TableCell> {{ profesor.destino }} </TableCell>
                         <TableCell> {{ profesor.carnet_identidad }} </TableCell>
                         <TableCell>
-                            <Button variant="outline"><Plus></Plus>Agregar</Button>
+                            <Button variant="outline" @click="addProfesorViaje(profesor.id)"><Plus></Plus>Agregar</Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>

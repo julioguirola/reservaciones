@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AddProfesorViaje from '@/components/AddProfesorViaje.vue';
 import DesvincularProfesorViaje from '@/components/DesvincularProfesorViaje.vue';
+import Input from '@/components/ui/input/Input.vue';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { onMounted, ref } from 'vue';
-
+import { computed, onMounted, ref } from 'vue';
 interface Profesor {
     id: string;
     persona_id: string;
@@ -23,7 +23,10 @@ const props = defineProps<{
     profesores: Profesor[];
     viaje_id: number;
     realizado: boolean;
+    lleno: boolean;
 }>();
+
+const profesores = ref<Profesor[]>(props.profesores);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -52,6 +55,15 @@ onMounted(async () => {
     asignaturas.value = data.asignaturas;
     facultades.value = data.facultades;
 });
+
+const patron = ref('');
+
+const profesoresFiltrados = computed(() => {
+    if (!patron.value) return profesores.value;
+    return profesores.value.filter((p) => {
+        return p.nombre.toLocaleLowerCase().includes(patron.value);
+    });
+});
 </script>
 
 <template>
@@ -59,8 +71,12 @@ onMounted(async () => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <p v-if="props.realizado" class="self-center">No se pueden desvincular o asignar profesores a un viaje realizado.</p>
-            <AddProfesorViaje v-else :viaje_id="props.viaje_id" />
-            <Table>
+            <p v-if="props.lleno && !props.realizado" class="self-center">Viaje lleno!</p>
+            <div class="flex justify-end gap-2">
+                <Input v-model="patron" placeholder="Buscar profesor" class="w-52" />
+                <AddProfesorViaje v-if="!props.realizado && !props.lleno" :viaje_id="props.viaje_id" />
+            </div>
+            <Table v-if="profesoresFiltrados.length">
                 <TableCaption>Información de los profesores</TableCaption>
                 <TableHeader>
                     <TableRow>
@@ -68,7 +84,7 @@ onMounted(async () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="profesor in props.profesores" :key="profesor.id">
+                    <TableRow v-for="profesor in profesoresFiltrados" :key="profesor.id">
                         <TableCell class="font-medium">
                             {{ profesor.nombre }}
                         </TableCell>
@@ -79,6 +95,7 @@ onMounted(async () => {
                     </TableRow>
                 </TableBody>
             </Table>
+            <p v-else class="self-center">No se encuentran profesores con ese criterio de búsqueda.</p>
         </div>
     </AppLayout>
 </template>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use App\Models\Viaje;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +46,7 @@ class ViajesController extends Controller
         return $destino->nombre;
       }, $destinos);
       $viaje->profesores_count = $profesores_count;
-      $viaje->recaudado = $recaudado;
+      $viaje->recaudado = round($recaudado, 2);
       $realizado = Carbon::now()->greaterThan($viaje->fecha);
       if ($realizado) {
         $viaje->realizado = true;
@@ -70,7 +72,7 @@ class ViajesController extends Controller
           $query->select('pv.profesor_id')->from('profesor_viaje as pv')->where('pv.viaje_id', $viaje_id);
         })
         ->orderBy('p.id')
-        ->select(['per.id as persona_id', 'per.nombre', 'per.carnet_identidad', 'd.nombre as destino'])
+        ->select(['per.id as persona_id', 'per.nombre', 'per.carnet_identidad', 'd.nombre as destino', 'p.id'])
         ->get()
         ->all();
 
@@ -99,12 +101,14 @@ class ViajesController extends Controller
 
       $viaje = DB::table('viaje')->where('id', $viaje_id)->first();
       $realizado = Carbon::now()->greaterThan($viaje->fecha);
+      $count = DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
 
       return Inertia::render('ProfesoresViaje', [
         'profesores' => $profesores_viaje,
         'viaje_id' => $viaje_id,
         'destinos_cant_profesores' => $destinos_cant_profesores,
         'realizado' => $realizado,
+        'lleno' => $count == 48,
       ]);
     }
   }
@@ -120,13 +124,22 @@ class ViajesController extends Controller
       ->sum('destino.precio');
   }
   public static function crearViaje(Request $request) {}
-  public static function addProfesorViaje(Request $request)
+  public static function addProfesorViaje(int $viaje_id, Request $request)
   {
-    $data = $request->all();
-    DB::table('profesor_viaje')->insert([
-      'profesor_id' => $data['profesor_id'],
-      'viaje_id' => $data['viaje_id'],
-    ]);
+    try {
+      $count = DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
+      if ($count == 48) {
+        return response()->json(['error' => 'Viaje lleno'], 400);
+      }
+      $data = $request->all();
+      DB::table('profesor_viaje')->insert([
+        'profesor_id' => $data['profesor_id'],
+        'viaje_id' => $viaje_id,
+      ]);
+      return ['succes' => 'Profesor agregado al viaje'];
+    } catch (QueryException $e) {
+      return response()->json(['error' => 'Error agregando profesor al viaje'], 400);
+    }
   }
   public static function changeChoferViaje(Request $request, string $viaje_id) {}
 
