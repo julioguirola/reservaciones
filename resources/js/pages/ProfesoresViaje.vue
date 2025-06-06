@@ -73,7 +73,7 @@ const profesoresFiltrados = computed(() => {
             <p v-if="props.realizado" class="self-center">No se pueden desvincular o asignar profesores a un viaje realizado.</p>
             <p v-if="props.lleno && !props.realizado" class="self-center">Viaje lleno!</p>
             <div class="flex justify-end gap-2">
-                <Input v-model="patron" placeholder="Buscar profesor" class="w-52" />
+                <Input v-model="patron" placeholder="Buscar profesor por nombre" class="w-52" />
                 <AddProfesorViaje v-if="!props.realizado && !props.lleno" :viaje_id="props.viaje_id" />
             </div>
             <Table v-if="profesoresFiltrados.length">

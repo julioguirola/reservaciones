@@ -43,6 +43,7 @@ class ProfesoresController extends Controller
       ->where('profesor.deleted_at', null)
       ->offset($request->query('page', 0) * 5)
       ->limit(5);
+    Log::debug($query->toSql());
     return ['profesores' => $query->get(), 'profesores_cant' => Profesor::count()];
   }
   public static function renderProfesores(Request $request): Response

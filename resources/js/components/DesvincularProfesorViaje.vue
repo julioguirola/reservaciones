@@ -41,8 +41,8 @@ async function removeProfesorViaje() {
             description: `Profesor desvinculado con éxito`,
             duration: 1500,
         });
-        router.reload();
         isOpen.value = false;
+        router.reload();
     }
 }
 

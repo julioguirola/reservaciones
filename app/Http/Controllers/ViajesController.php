@@ -71,6 +71,7 @@ class ViajesController extends Controller
         ->whereNotIn('p.id', function ($query) use ($viaje_id) {
           $query->select('pv.profesor_id')->from('profesor_viaje as pv')->where('pv.viaje_id', $viaje_id);
         })
+        ->where('p.deleted_at', null)
         ->orderBy('p.id')
         ->select(['per.id as persona_id', 'per.nombre', 'per.carnet_identidad', 'd.nombre as destino', 'p.id'])
         ->get()
@@ -119,6 +120,7 @@ class ViajesController extends Controller
       ->select('destino.precio')
       ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
       ->join('destino', 'profesor.destino_id', '=', 'destino.id')
+      ->join('viaje', 'profesor_viaje.viaje_id', '=', 'viaje.id')
       ->where('profesor_viaje.viaje_id', $viaje_id)
       ->where('profesor.tarifa', true)
       ->sum('destino.precio');
@@ -136,6 +138,14 @@ class ViajesController extends Controller
         'profesor_id' => $data['profesor_id'],
         'viaje_id' => $viaje_id,
       ]);
+      $viaje = Viaje::find($viaje_id);
+      $fecha = $viaje['fecha'];
+      $mes = explode('-', $fecha)[1];
+      if (!($mes == '08' || $mes == '09')) {
+        DB::table('profesor')
+          ->where('id', $data['profesor_id'])
+          ->update(['tarifa' => true]);
+      }
       return ['succes' => 'Profesor agregado al viaje'];
     } catch (QueryException $e) {
       return response()->json(['error' => 'Error agregando profesor al viaje'], 400);
@@ -152,7 +162,14 @@ class ViajesController extends Controller
     }
     $data = $request->all();
     $deleted = DB::table('profesor_viaje')->where('profesor_id', $data['profesor_id'])->where('viaje_id', $viaje_id)->delete();
-
+    $viaje = Viaje::find($viaje_id);
+    $fecha = $viaje['fecha'];
+    $mes = explode('-', $fecha)[1];
+    if (!($mes == '08' || $mes == '09')) {
+      DB::table('profesor')
+        ->where('id', $data['profesor_id'])
+        ->update(['tarifa' => false]);
+    }
     if ($deleted) {
       return response()->json(['message' => 'Profesor eliminado del viaje'], 200);
     } else {

@@ -45,7 +45,7 @@ const asignaturas = ref<ProfesorCampos[]>([]);
 const facultades = ref<ProfesorCampos[]>([]);
 
 const profesores = ref<Profesor[]>(props.profesores);
-const actual_page = ref<number>(0);
+const actual_page = ref<number>(1);
 const profesores_cant = ref<number>(props.profesores_cant);
 
 const change_page = async () => {

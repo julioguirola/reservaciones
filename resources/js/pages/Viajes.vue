@@ -25,7 +25,7 @@ const props = defineProps<{
 }>();
 
 const viajes = ref<Viaje[]>(props.viajes);
-const actual_page = ref<number>(0);
+const actual_page = ref<number>(1);
 const viajes_cant = ref<number>(props.viajes_cant);
 
 const change_page = async () => {

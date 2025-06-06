@@ -2,12 +2,13 @@
 import CrearChoferDialog from '@/components/CrearChoferDialog.vue';
 import EditChoferDialog from '@/components/EditChoferDialog.vue';
 import EliminarPersonaDialog from '@/components/EliminarPersonaDialog.vue';
+import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,7 +31,7 @@ const props = defineProps<{
     choferes_cant: number;
 }>();
 
-const actual_page = ref<number>(0);
+const actual_page = ref<number>(1);
 const choferes = ref<Chofer[]>(props.choferes);
 const choferes_cant = ref<number>(props.choferes_cant);
 
@@ -41,8 +42,26 @@ const change_page = async () => {
     choferes_cant.value = data.choferes_cant;
 };
 
-watch(actual_page, async () => {
+watch(actual_page, () => {
     change_page();
+});
+
+const patron = ref('');
+
+watch(patron, () => {
+    filtrarChoferes.value = patron.value;
+});
+const filtrarChoferes = computed({
+    async set(patron: string) {
+        actual_page.value = 1;
+        const res = await fetch(route('choferes.data') + `?page=${actual_page.value - 1}` + `&licencia_numero=${patron}`);
+        const data = await res.json();
+        choferes.value = data.choferes;
+        choferes_cant.value = data.choferes_cant;
+    },
+    get() {
+        return choferes.value;
+    },
 });
 </script>
 
@@ -51,7 +70,10 @@ watch(actual_page, async () => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <CrearChoferDialog :change_page="change_page" />
+            <div class="flex justify-end gap-2">
+                <Input v-model="patron" placeholder="Buscar chofer por licencia" class="w-52" />
+                <CrearChoferDialog :change_page="change_page" />
+            </div>
             <Table>
                 <TableCaption>Información de los choferes</TableCaption>
                 <TableHeader>
