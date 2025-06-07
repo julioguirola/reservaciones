@@ -4,21 +4,10 @@ import DesvincularProfesorViaje from '@/components/DesvincularProfesorViaje.vue'
 import Input from '@/components/ui/input/Input.vue';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Profesor, ProfesorCampos, type BreadcrumbItem } from '@/types';
+import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
-interface Profesor {
-    id: string;
-    persona_id: string;
-    nombre: string;
-    carnet_identidad: string;
-    destino: string;
-    facultad: string;
-    asignatura: string;
-    destino_id: number;
-    facultad_id: number;
-    asignatura_id: number;
-}
+
 const props = defineProps<{
     profesores: Profesor[];
     viaje_id: number;
@@ -36,11 +25,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const heads = ['Nombre', 'Destino', 'Acciones'];
-
-interface ProfesorCampos {
-    id?: number;
-    nombre?: string;
-}
 
 const destinos = ref<ProfesorCampos[]>([]);
 const asignaturas = ref<ProfesorCampos[]>([]);
@@ -64,6 +48,10 @@ const profesoresFiltrados = computed(() => {
         return p.nombre.toLocaleLowerCase().includes(patron.value);
     });
 });
+
+function refresh() {
+    router.get(route('viajes.profesores', { viaje_id: props.viaje_id }));
+}
 </script>
 
 <template>
@@ -74,28 +62,34 @@ const profesoresFiltrados = computed(() => {
             <p v-if="props.lleno && !props.realizado" class="self-center">Viaje lleno!</p>
             <div class="flex justify-end gap-2">
                 <Input v-model="patron" placeholder="Buscar profesor por nombre" class="w-52" />
-                <AddProfesorViaje v-if="!props.realizado && !props.lleno" :viaje_id="props.viaje_id" />
+                <AddProfesorViaje v-if="!props.realizado && !props.lleno" :viaje_id="props.viaje_id" :refresh="refresh" />
             </div>
-            <Table v-if="profesoresFiltrados.length">
-                <TableCaption>Información de los profesores</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead v-for="(head, i) in heads" :key="i"> {{ head }} </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    <TableRow v-for="profesor in profesoresFiltrados" :key="profesor.id">
-                        <TableCell class="font-medium">
-                            {{ profesor.nombre }}
-                        </TableCell>
-                        <TableCell> {{ profesor.destino }} </TableCell>
-                        <TableCell
-                            ><DesvincularProfesorViaje :viaje_id="props.viaje_id" :profesor_id="profesor.id" :viaje_realizado="realizado"
-                        /></TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-            <p v-else class="self-center">No se encuentran profesores con ese criterio de búsqueda.</p>
+            <div class="flex w-full gap-4">
+                <Table v-if="profesoresFiltrados.length">
+                    <TableCaption>Información de los profesores</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead v-for="(head, i) in heads" :key="i"> {{ head }} </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow v-for="profesor in profesoresFiltrados" :key="profesor.id">
+                            <TableCell class="font-medium">
+                                {{ profesor.nombre }}
+                            </TableCell>
+                            <TableCell> {{ profesor.destino }} </TableCell>
+                            <TableCell
+                                ><DesvincularProfesorViaje
+                                    :viaje_id="props.viaje_id"
+                                    :profesor_id="profesor.id"
+                                    :viaje_realizado="realizado"
+                                    :refresh="refresh"
+                            /></TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+                <p v-else class="self-center">No se encuentran profesores con ese criterio de búsqueda.</p>
+            </div>
         </div>
     </AppLayout>
 </template>

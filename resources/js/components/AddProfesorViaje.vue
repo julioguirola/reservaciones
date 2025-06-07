@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { type Profesor } from '@/types';
-import { router } from '@inertiajs/vue3';
 import { Plus } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { toast } from './ui/toast';
 const props = defineProps<{
+    refresh: () => void;
     viaje_id: number;
 }>();
 
@@ -53,7 +53,7 @@ const addProfesorViaje = async (profesor_id: string) => {
             duration: 1500,
         });
         isOpen.value = false;
-        router.reload();
+        props.refresh();
     }
 };
 </script>

@@ -10,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { router } from '@inertiajs/vue3';
 import { ListMinus } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { toast } from './ui/toast';
@@ -19,6 +18,7 @@ const props = defineProps<{
     viaje_id: number;
     profesor_id: string;
     viaje_realizado: boolean;
+    refresh: () => void;
 }>();
 
 async function removeProfesorViaje() {
@@ -42,7 +42,7 @@ async function removeProfesorViaje() {
             duration: 1500,
         });
         isOpen.value = false;
-        router.reload();
+        props.refresh();
     }
 }
 

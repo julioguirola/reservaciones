@@ -94,12 +94,6 @@ class ViajesController extends Controller
         ->get()
         ->all();
 
-      $destinos_cant_profesores = [];
-
-      foreach ($profesores_viaje as $profesor) {
-        $destinos_cant_profesores[$profesor->destino] = ($destinos_cant_profesores[$profesor->destino] ?? 0) + 1;
-      }
-
       $viaje = DB::table('viaje')->where('id', $viaje_id)->first();
       $realizado = Carbon::now()->greaterThan($viaje->fecha);
       $count = DB::table('profesor_viaje')->where('viaje_id', $viaje_id)->count();
@@ -107,7 +101,6 @@ class ViajesController extends Controller
       return Inertia::render('ProfesoresViaje', [
         'profesores' => $profesores_viaje,
         'viaje_id' => $viaje_id,
-        'destinos_cant_profesores' => $destinos_cant_profesores,
         'realizado' => $realizado,
         'lleno' => $count == 48,
       ]);
