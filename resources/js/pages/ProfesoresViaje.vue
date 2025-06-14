@@ -2,20 +2,23 @@
 import AddProfesorViaje from '@/components/AddProfesorViaje.vue';
 import DesvincularProfesorViaje from '@/components/DesvincularProfesorViaje.vue';
 import Input from '@/components/ui/input/Input.vue';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Profesor, ProfesorCampos, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
     profesores: Profesor[];
     viaje_id: number;
     realizado: boolean;
     lleno: boolean;
+    destinos: ProfesorCampos[];
 }>();
 
 const profesores = ref<Profesor[]>(props.profesores);
+const destino_seleccionado = ref(0);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,26 +29,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const heads = ['Nombre', 'Destino', 'Acciones'];
 
-const destinos = ref<ProfesorCampos[]>([]);
-const asignaturas = ref<ProfesorCampos[]>([]);
-const facultades = ref<ProfesorCampos[]>([]);
-
-onMounted(async () => {
-    let res = await fetch(route('destinos.data'));
-    let data = await res.json();
-    destinos.value = data;
-    res = await fetch(route('profesores.asignaturas_facultades'));
-    data = await res.json();
-    asignaturas.value = data.asignaturas;
-    facultades.value = data.facultades;
-});
-
 const patron = ref('');
 
 const profesoresFiltrados = computed(() => {
-    if (!patron.value) return profesores.value;
+    if (!destino_seleccionado.value && !patron.value) return profesores.value;
     return profesores.value.filter((p) => {
-        return p.nombre.toLocaleLowerCase().includes(patron.value);
+        return (
+            p.nombre.toLocaleLowerCase().includes(patron.value) && (p.destino_id === destino_seleccionado.value || destino_seleccionado.value === 0)
+        );
     });
 });
 
@@ -61,6 +52,18 @@ function refresh() {
             <p v-if="props.realizado" class="self-center">No se pueden desvincular o asignar profesores a un viaje realizado.</p>
             <p v-if="props.lleno && !props.realizado" class="self-center">Viaje lleno!</p>
             <div class="flex justify-end gap-2">
+                <Select id="origen" v-model="destino_seleccionado">
+                    <SelectTrigger class="col-span-3 w-52">
+                        <SelectValue placeholder="Selecciona una provincia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectItem :value="0" :key="0"> -- Filtrar por destino --</SelectItem>
+
+                            <SelectItem v-for="destino in props.destinos" :value="destino.id!" :key="destino.id"> {{ destino.nombre }} </SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
                 <Input v-model="patron" placeholder="Buscar profesor por nombre" class="w-52" />
                 <AddProfesorViaje v-if="!props.realizado && !props.lleno" :viaje_id="props.viaje_id" :refresh="refresh" />
             </div>

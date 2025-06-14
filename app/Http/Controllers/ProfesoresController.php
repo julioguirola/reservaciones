@@ -36,15 +36,70 @@ class ProfesoresController extends Controller
         'facultad.id as facultad_id',
         'asignatura.id as asignatura_id',
       )
+      ->selectRaw(
+        "(select count(*) from profesor_viaje pv
+        join viaje v on pv.viaje_id = v.id
+        where pv.profesor_id = profesor.id
+        and (cast(strftime('%m', v.fecha) as integer) between 4 and 7)
+        ) as cant_viajes_abril_julio",
+      )
+      ->selectRaw(
+        "(select count(*) from profesor_viaje pv
+        join viaje v on pv.viaje_id = v.id
+        where pv.profesor_id = profesor.id
+        and (cast(strftime('%m', v.fecha) as integer) between 8 and 9)
+        ) as cant_viajes_agosto_septiembre",
+      )
+      ->selectRaw(
+        "(select count(*) from profesor_viaje pv
+        join viaje v on pv.viaje_id = v.id
+        where pv.profesor_id = profesor.id
+        and (cast(strftime('%m', v.fecha) as integer) between 10 and 12
+        or cast(strftime('%m', v.fecha) as integer) between 1 and 3)
+        ) as cant_viajes_octubre_marzo",
+      )
+      ->selectRaw(
+        '(select count(*) from profesor_viaje pv
+        where pv.profesor_id = profesor.id
+        ) as cant_viajes',
+      )
       ->join('persona', 'profesor.persona_id', '=', 'persona.id')
       ->join('destino', 'profesor.destino_id', '=', 'destino.id')
       ->join('facultad', 'profesor.facultad_id', '=', 'facultad.id')
       ->join('asignatura', 'profesor.asignatura_id', '=', 'asignatura.id')
-      ->where('profesor.deleted_at', null)
-      ->offset($request->query('page', 0) * 5)
-      ->limit(5);
-    Log::debug($query->toSql());
-    return ['profesores' => $query->get(), 'profesores_cant' => Profesor::count()];
+      ->where('profesor.deleted_at', null);
+
+    $cant_viajes_filter = $request->query('cant_viajes') + 0;
+
+    if ($cant_viajes_filter) {
+      return [
+        'profesores' => $query
+          ->where('cant_viajes', $cant_viajes_filter)
+          ->offset($request->query('page', 0) * 5)
+          ->limit(5)
+          ->get(),
+        'profesores_cant' => count(
+          DB::table('profesor')
+            ->selectRaw(
+              '(select count(*) from profesor_viaje pv
+          where pv.profesor_id = profesor.id
+          ) as cant_viajes',
+            )
+            ->where('cant_viajes', $cant_viajes_filter)
+            ->where('profesor.deleted_at', null)
+            ->get()
+            ->all(),
+        ),
+      ];
+    }
+
+    return [
+      'profesores' => $query
+        ->offset($request->query('page', 0) * 5)
+        ->limit(5)
+        ->get(),
+      'profesores_cant' => Profesor::count(),
+    ];
   }
   public static function renderProfesores(Request $request): Response
   {

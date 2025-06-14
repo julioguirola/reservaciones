@@ -52,6 +52,10 @@ interface Profesor {
     destino_id: number;
     facultad_id: number;
     asignatura_id: number;
+    cant_viajes_abril_julio: number;
+    cant_viajes_agosto_septiembre: number;
+    cant_viajes_octubre_marzo: number;
+    cant_viajes: number;
 }
 
 interface Chofer {

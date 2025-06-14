@@ -2,12 +2,14 @@
 import CrearProfesorDialog from '@/components/CrearProfesorDialog.vue';
 import EditProfesorDialog from '@/components/EditProfesorDialog.vue';
 import EliminarPersonaDialog from '@/components/EliminarPersonaDialog.vue';
+import Input from '@/components/ui/input/Input.vue';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import ViajesCounter from '@/components/ViajesCounter.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
+import { Profesor, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,18 +18,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface Profesor {
-    id: string;
-    persona_id: string;
-    nombre: string;
-    carnet_identidad: string;
-    destino: string;
-    facultad: string;
-    asignatura: string;
-    destino_id: number;
-    facultad_id: number;
-    asignatura_id: number;
-}
 const props = defineProps<{
     profesores: Profesor[];
     profesores_cant: number;
@@ -49,7 +39,7 @@ const actual_page = ref<number>(1);
 const profesores_cant = ref<number>(props.profesores_cant);
 
 const change_page = async () => {
-    const res = await fetch(route('profesores.data') + `?page=${actual_page.value - 1}`);
+    const res = await fetch(route('profesores.data') + `?page=${actual_page.value - 1}` + `&cant_viajes=${cant_viajes.value}`);
     const data = await res.json();
     profesores.value = data.profesores;
     profesores_cant.value = data.profesores_cant;
@@ -68,18 +58,39 @@ onMounted(async () => {
     asignaturas.value = data.asignaturas;
     facultades.value = data.facultades;
 });
+
+const cant_viajes = ref();
+watch(cant_viajes, () => {
+    filtrarProfesores.value = cant_viajes.value;
+});
+const filtrarProfesores = computed({
+    async set(cant_viajes: number) {
+        actual_page.value = 1;
+        const res = await fetch(route('profesores.data') + `?page=${actual_page.value - 1}` + `&cant_viajes=${cant_viajes}`);
+        const data = await res.json();
+        profesores.value = data.profesores;
+        profesores_cant.value = data.profesores_cant;
+    },
+    get() {
+        return props.profesores;
+    },
+});
 </script>
 
 <template>
     <Head title="Profesores" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <CrearProfesorDialog :destinos="destinos" :facultades="facultades" :asignaturas="asignaturas" :change_page="change_page" />
+            <div class="flex justify-end gap-2">
+                <Input v-model="cant_viajes" class="w-20" type="number" />
+                <CrearProfesorDialog :destinos="destinos" :facultades="facultades" :asignaturas="asignaturas" :change_page="change_page" />
+            </div>
             <Table>
                 <TableCaption>Informacion de los profesores</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead v-for="(head, i) in heads" :key="i"> {{ head }} </TableHead>
+                        <TableHead> Cantidad de Viajes </TableHead>
                         <TableHead> Acciones </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -92,6 +103,13 @@ onMounted(async () => {
                         <TableCell> {{ profesor.destino }} </TableCell>
                         <TableCell> {{ profesor.facultad }} </TableCell>
                         <TableCell> {{ profesor.asignatura }} </TableCell>
+                        <TableCell
+                            ><ViajesCounter
+                                :cant_viajes="profesor.cant_viajes"
+                                :cant_viajes_abril_julio="profesor.cant_viajes_abril_julio"
+                                :cant_viajes_agosto_septiembre="profesor.cant_viajes_agosto_septiembre"
+                                :cant_viajes_octubre_marzo="profesor.cant_viajes_octubre_marzo"
+                        /></TableCell>
                         <TableCell class="flex gap-1">
                             <EditProfesorDialog
                                 :nombre="profesor.nombre"

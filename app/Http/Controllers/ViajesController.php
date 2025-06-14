@@ -86,6 +86,7 @@ class ViajesController extends Controller
           'persona.nombre',
           'destino.nombre as destino',
           'destino.precio as tarifa',
+          'profesor.destino_id',
         )
         ->where('profesor_viaje.viaje_id', $viaje_id)
         ->join('persona', 'profesor.persona_id', '=', 'persona.id')
@@ -103,6 +104,7 @@ class ViajesController extends Controller
         'viaje_id' => $viaje_id,
         'realizado' => $realizado,
         'lleno' => $count == 48,
+        'destinos' => DB::table('destino')->select()->get()->all(),
       ]);
     }
   }

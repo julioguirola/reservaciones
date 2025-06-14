@@ -46,7 +46,7 @@ const submit = () => {
                         :tabindex="1"
                         autocomplete="email"
                         v-model="form.email"
-                        placeholder="email@example.com"
+                        placeholder="email@ejemplo.com"
                     />
                     <InputError :message="form.errors.email" />
                 </div>
@@ -62,7 +62,7 @@ const submit = () => {
                         :tabindex="2"
                         autocomplete="current-password"
                         v-model="form.password"
-                        placeholder="Password"
+                        placeholder="Contraseña"
                     />
                     <InputError :message="form.errors.password" />
                 </div>

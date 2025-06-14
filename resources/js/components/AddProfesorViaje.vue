@@ -61,7 +61,7 @@ const addProfesorViaje = async (profesor_id: string) => {
 <template>
     <Dialog v-model:open="isOpen">
         <DialogTrigger as-child>
-            <Button variant="outline">Asignar profesor</Button>
+            <Button variant="outline">Asignar profesor <Plus /></Button>
         </DialogTrigger>
         <DialogContent class="h-[90vh] sm:max-w-[750px]">
             <DialogHeader>

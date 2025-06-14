@@ -36,7 +36,7 @@ const choferes = ref<Chofer[]>(props.choferes);
 const choferes_cant = ref<number>(props.choferes_cant);
 
 const change_page = async () => {
-    const res = await fetch(route('choferes.data') + `?page=${actual_page.value - 1}`);
+    const res = await fetch(route('choferes.data') + `?page=${actual_page.value - 1}` + `&licencia_numero=${patron.value}`);
     const data = await res.json();
     choferes.value = data.choferes;
     choferes_cant.value = data.choferes_cant;

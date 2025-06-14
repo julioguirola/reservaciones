@@ -23,8 +23,7 @@ class ChoferesController extends Controller
     $choferes = DB::table('chofer')
       ->select('chofer.id', 'persona.id as persona_id', 'persona.nombre', 'persona.carnet_identidad', 'chofer.licencia_numero')
       ->join('persona', 'chofer.persona_id', '=', 'persona.id')
-      ->where('chofer.deleted_at', null)
-      ->offset($request->query('page', 0) * 5);
+      ->where('chofer.deleted_at', null);
 
     $licencia_numero_filter = $request->query('licencia_numero');
 
@@ -32,7 +31,11 @@ class ChoferesController extends Controller
       $choferes = $choferes->where('chofer.licencia_numero', 'LIKE', '%' . $licencia_numero_filter . '%');
     }
 
-    $choferes = $choferes->limit(5)->get()->all();
+    $choferes = $choferes
+      ->offset($request->query('page', 0) * 5)
+      ->limit(5)
+      ->get()
+      ->all();
 
     $choferes_viajes = array_map(function ($chofer) {
       $cant_viajes = DB::table('viaje')->where('chofer_id', $chofer->id)->count();
