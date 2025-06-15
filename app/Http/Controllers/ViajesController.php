@@ -19,10 +19,22 @@ class ViajesController extends Controller
    */
   public static function getViajes(Request $request)
   {
-    $viajes = DB::table('viaje')
+    $count = 0;
+    $query = DB::table('viaje')
       ->select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
       ->join('chofer', 'chofer.id', '=', 'viaje.chofer_id')
-      ->join('persona', 'persona.id', '=', 'chofer.persona_id')
+      ->join('persona', 'persona.id', '=', 'chofer.persona_id');
+
+    $fecha_filter = $request->query('fecha');
+
+    if ($fecha_filter) {
+      $query = $query->whereDate('fecha', $fecha_filter);
+      $count = Viaje::whereDate('fecha', $fecha_filter)->count();
+    } else {
+      $count = Viaje::count();
+    }
+
+    $viajes = $query
       ->offset($request->query('page', 0) * 8)
       ->limit(8)
       ->get()
@@ -54,7 +66,7 @@ class ViajesController extends Controller
       return $viaje;
     }, $viajes);
 
-    return ['viajes' => $viajes_destinos, 'viajes_cant' => Viaje::count()];
+    return ['viajes' => $viajes_destinos, 'viajes_cant' => $count];
   }
 
   public function renderViajes(Request $request): Response

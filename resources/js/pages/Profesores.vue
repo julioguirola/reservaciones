@@ -39,7 +39,9 @@ const actual_page = ref<number>(1);
 const profesores_cant = ref<number>(props.profesores_cant);
 
 const change_page = async () => {
-    const res = await fetch(route('profesores.data') + `?page=${actual_page.value - 1}` + `&cant_viajes=${cant_viajes.value}`);
+    const res = await fetch(
+        route('profesores.data') + `?page=${actual_page.value - 1}` + (cant_viajes.value ? `&cant_viajes=${cant_viajes.value}` : ''),
+    );
     const data = await res.json();
     profesores.value = data.profesores;
     profesores_cant.value = data.profesores_cant;
