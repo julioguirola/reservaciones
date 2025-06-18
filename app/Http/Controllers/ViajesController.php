@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Database\QueryException;
 use App\Models\Viaje;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class ViajesController extends Controller
   {
     $count = 0;
     $query = DB::table('viaje')
-      ->select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre')
+      ->select('viaje.id', 'viaje.fecha', 'persona.nombre as chofer_nombre', 'viaje.chofer_id')
       ->join('chofer', 'chofer.id', '=', 'viaje.chofer_id')
       ->join('persona', 'persona.id', '=', 'chofer.persona_id');
 
@@ -132,7 +133,6 @@ class ViajesController extends Controller
       ->where('profesor.tarifa', true)
       ->sum('destino.precio');
   }
-  public static function crearViaje(Request $request) {}
   public static function addProfesorViaje(int $viaje_id, Request $request)
   {
     try {
@@ -182,5 +182,69 @@ class ViajesController extends Controller
     } else {
       return response()->json(['error' => 'Error al eliminar el profesor del viaje'], 500);
     }
+  }
+
+  public static function deleteViaje(string $viaje_id)
+  {
+    try {
+      $data = DB::table('viaje')->where('id', $viaje_id)->delete();
+      return ['deleted' => $data];
+    } catch (QueryException $e) {
+      return ['error' => 'Error eliminando viaje'];
+    }
+  }
+
+  public static function getViaje(string $viaje_id)
+  {
+    return DB::table('viaje')->select()->where('id', $viaje_id)->get()[0];
+  }
+
+  public static function editViaje(Request $request, string $viaje_id)
+  {
+    $data = $request->all();
+    $validator = Validator::make($request->all(), [
+      'fecha' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+
+    Viaje::where('id', $viaje_id)->update([
+      'fecha' => $data['fecha'],
+      'chofer_id' => $data['chofer_id'],
+    ]);
+
+    return self::getViaje($viaje_id);
+  }
+
+  public static function crearViaje(Request $request)
+  {
+    $data = $request->all();
+    $validator = Validator::make($request->all(), [
+      'fecha' => 'required',
+      'chofer_id' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(
+        [
+          'errors' => $validator->errors(),
+        ],
+        422,
+      );
+    }
+
+    $viaje = Viaje::create([
+      'fecha' => $data['fecha'],
+      'chofer_id' => $data['chofer_id'],
+    ]);
+
+    return ['viaje' => $viaje];
   }
 }

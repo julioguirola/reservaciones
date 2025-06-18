@@ -26,16 +26,21 @@ class ChoferesController extends Controller
       ->where('chofer.deleted_at', null);
 
     $licencia_numero_filter = $request->query('licencia_numero');
+    $todos_filter = $request->query('todos');
 
     if ($licencia_numero_filter) {
       $choferes = $choferes->where('chofer.licencia_numero', 'LIKE', '%' . $licencia_numero_filter . '%');
     }
 
-    $choferes = $choferes
-      ->offset($request->query('page', 0) * 5)
-      ->limit(5)
-      ->get()
-      ->all();
+    if ($todos_filter) {
+      $choferes = $choferes->get()->all();
+    } else {
+      $choferes = $choferes
+        ->offset($request->query('page', 0) * 5)
+        ->limit(5)
+        ->get()
+        ->all();
+    }
 
     $choferes_viajes = array_map(function ($chofer) {
       $cant_viajes = DB::table('viaje')->where('chofer_id', $chofer->id)->count();

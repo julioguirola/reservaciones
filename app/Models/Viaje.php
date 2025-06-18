@@ -18,6 +18,7 @@ class Viaje extends Model
   protected $primaryKey = 'id';
   public DateTime $fecha;
   public $timestamps = false;
+  protected $fillable = ['fecha', 'chofer_id'];
   /**
    * @return BelongsTo<Chofer,Viaje>
    */

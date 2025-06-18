@@ -75,6 +75,7 @@ export interface Viaje {
     profesores_count: number;
     recaudado: number;
     realizado: boolean;
+    chofer_id: string;
 }
 export type BreadcrumbItemType = BreadcrumbItem;
 
