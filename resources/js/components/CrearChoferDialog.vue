@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Errors } from '@/lib/utils';
 import { Plus } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from './InputError.vue';
@@ -82,18 +83,18 @@ const submit = async () => {
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="nombre" class="text-right"> Nombre </Label>
                     <Input id="nombre" v-model="nombre" class="col-span-3" />
-                    <InputError v-if="errors.nombre" :message="errors.nombre[0]" />
+                    <InputError v-if="errors.nombre" :message="Errors[errors.nombre[0]]" class="w-52" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="carnet_identidad" class="text-right"> Carnet de Identidad </Label>
                     <Input id="carnet_identidad" v-model="carnet_identidad" class="col-span-3" />
-                    <InputError v-if="errors.carnet_identidad" :message="errors.carnet_identidad[0]" />
+                    <InputError v-if="errors.carnet_identidad" :message="Errors[errors.carnet_identidad[0]]" class="w-52" />
                 </div>
 
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="licencia_numero" class="text-right"> Número de licencia </Label>
                     <Input id="licencia_numero" v-model="licencia_numero" class="col-span-3" />
-                    <InputError v-if="errors.licencia_numero" :message="errors.licencia_numero[0]" />
+                    <InputError v-if="errors.licencia_numero" :message="Errors[errors.licencia_numero[0]]" class="w-52" />
                 </div>
             </div>
             <DialogFooter

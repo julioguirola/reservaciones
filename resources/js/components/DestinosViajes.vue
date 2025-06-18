@@ -10,7 +10,7 @@ const expandido = ref(false);
 
 <template>
     <div @click="expandido = !expandido" class="flex select-none gap-1 hover:cursor-pointer">
-        <MapPin />
+        <MapPin color="#2563EB" />
         <span v-if="expandido">{{ props.destinos.join(', ') }}</span>
         <span v-else>{{ props.destinos.slice(0, 3).join(', ') + ' ...' }}</span>
     </div>

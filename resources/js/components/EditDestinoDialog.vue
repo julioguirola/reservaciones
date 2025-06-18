@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Errors } from '@/lib/utils';
 import { router } from '@inertiajs/vue3';
 import { Pencil } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -45,7 +46,7 @@ const submit = async () => {
     });
     const data = await res.json();
     if (data.errors) {
-        errors.value = {};
+        errors.value = data.errors;
     } else {
         isOpen.value = false;
         toast({
@@ -72,7 +73,7 @@ const submit = async () => {
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="nombre" class="text-right"> Precio </Label>
                     <Input id="nombre" v-model="precio" class="col-span-3" />
-                    <InputError v-if="errors.precio" :message="errors.precio[0]" />
+                    <InputError v-if="errors.precio" :message="Errors[errors.precio[0]]" class="w-52" />
                 </div>
             </div>
             <DialogFooter

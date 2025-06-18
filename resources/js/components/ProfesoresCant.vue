@@ -8,6 +8,6 @@ const props = defineProps<{
 
 <template>
     <div class="flex gap-1 rounded-sm p-1 hover:cursor-pointer hover:bg-gray-200">
-        <UserPen /><span>{{ props.profesores_count }}</span>
+        <UserPen color="#6B7280" /><span>{{ props.profesores_count }}</span>
     </div>
 </template>

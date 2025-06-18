@@ -36,12 +36,12 @@ export interface User {
     updated_at: string;
 }
 
-interface ProfesorCampos {
+export interface ProfesorCampos {
     id?: number;
     nombre?: string;
 }
 
-interface Profesor {
+export interface Profesor {
     id: string;
     persona_id: string;
     nombre: string;
@@ -58,7 +58,7 @@ interface Profesor {
     cant_viajes: number;
 }
 
-interface Chofer {
+export interface Chofer {
     id: string;
     persona_id: string;
     licencia_numero: string;
@@ -67,7 +67,7 @@ interface Chofer {
     cant_viajes: number;
 }
 
-interface Viaje {
+export interface Viaje {
     id: number;
     chofer_nombre: string;
     fecha: string;
@@ -77,3 +77,7 @@ interface Viaje {
     realizado: boolean;
 }
 export type BreadcrumbItemType = BreadcrumbItem;
+
+export interface ValidationErrors {
+    [key: string]: string;
+}

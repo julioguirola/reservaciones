@@ -3,6 +3,7 @@ import CrearProfesorDialog from '@/components/CrearProfesorDialog.vue';
 import EditProfesorDialog from '@/components/EditProfesorDialog.vue';
 import EliminarPersonaDialog from '@/components/EliminarPersonaDialog.vue';
 import Input from '@/components/ui/input/Input.vue';
+import { Label } from '@/components/ui/label';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ViajesCounter from '@/components/ViajesCounter.vue';
@@ -39,8 +40,13 @@ const actual_page = ref<number>(1);
 const profesores_cant = ref<number>(props.profesores_cant);
 
 const change_page = async () => {
+    const cond = parseInt(cant_viajes.value) >= 0;
+
     const res = await fetch(
-        route('profesores.data') + `?page=${actual_page.value - 1}` + (cant_viajes.value ? `&cant_viajes=${cant_viajes.value}` : ''),
+        route('profesores.data') +
+            `?page=${actual_page.value - 1}` +
+            (cond ? `&cant_viajes=${cant_viajes.value}` : '') +
+            (carnet.value ? `&carnet=${carnet.value}` : ''),
     );
     const data = await res.json();
     profesores.value = data.profesores;
@@ -62,13 +68,27 @@ onMounted(async () => {
 });
 
 const cant_viajes = ref();
+const carnet = ref();
+
 watch(cant_viajes, () => {
-    filtrarProfesores.value = cant_viajes.value;
+    filtrarProfesores.value = { cv: cant_viajes.value, ci: carnet.value };
 });
+
+watch(carnet, () => {
+    filtrarProfesores.value = { cv: cant_viajes.value, ci: carnet.value };
+});
+
 const filtrarProfesores = computed({
-    async set(cant_viajes: number) {
+    async set(filtros: { cv: string; ci: string }) {
+        const { cv, ci } = filtros;
         actual_page.value = 1;
-        const res = await fetch(route('profesores.data') + `?page=${actual_page.value - 1}` + `&cant_viajes=${cant_viajes}`);
+        const cond = parseInt(cv) >= 0;
+        const res = await fetch(
+            route('profesores.data') +
+                `?page=${actual_page.value - 1}` +
+                (cond ? `&cant_viajes=${filtros.cv}` : '') +
+                (ci ? `&carnet=${filtros.ci}` : ''),
+        );
         const data = await res.json();
         profesores.value = data.profesores;
         profesores_cant.value = data.profesores_cant;
@@ -84,7 +104,9 @@ const filtrarProfesores = computed({
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex justify-end gap-2">
-                <Input v-model="cant_viajes" class="w-20" type="number" />
+                <Label for="carnteFilter" class="self-center">Filtrar por cantidad de viajes</Label>
+                <Input v-model="cant_viajes" class="w-20" type="number" min="0" id="cantViajesFilter" placeholder="#" />
+                <Input v-model="carnet" class="w-52" placeholder="Buscar profesor por carnet" />
                 <CrearProfesorDialog :destinos="destinos" :facultades="facultades" :asignaturas="asignaturas" :change_page="change_page" />
             </div>
             <Table>

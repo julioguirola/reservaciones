@@ -4,6 +4,7 @@ import ProfesoresCant from '@/components/ProfesoresCant.vue';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -66,9 +67,14 @@ const filtrarViajes = computed({
     <Head title="Viajes" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="grid h-full gap-4 rounded-xl p-4">
+            <Label for="calendar" class="self-center">Buscar viaje por fecha</Label>
             <Popover>
                 <PopoverTrigger as-child>
-                    <Button variant="outline" :class="cn('w-[280px] justify-start text-left font-normal', !date && 'text-muted-foreground')">
+                    <Button
+                        id="calendar"
+                        variant="outline"
+                        :class="cn('w-[280px] justify-start text-left font-normal', !date && 'text-muted-foreground')"
+                    >
                         <CalendarIcon class="mr-2 h-4 w-4" />
                         {{ date ? df.format(date.toDate(getLocalTimeZone())) : 'Selecciona una fecha' }}
                     </Button>
@@ -80,11 +86,11 @@ const filtrarViajes = computed({
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 <Card v-for="viaje in viajes" :key="viaje.id">
                     <CardHeader class="flex flex-row items-center justify-between py-2">
-                        <CardTitle>Viaje {{ viaje.id }}</CardTitle>
-                        {{ viaje.fecha.split(' ')[0] }}<CalendarDays />
+                        <CardTitle class="text-[#1E3A8A]">Viaje {{ viaje.id }}</CardTitle>
+                        {{ viaje.fecha.split(' ')[0] }}<CalendarDays color="#64748B" />
                     </CardHeader>
                     <CardContent class="flex flex-row items-center justify-between py-2"
-                        ><UserCog /> {{ viaje.chofer_nombre
+                        ><UserCog color="#4B5563" /> {{ viaje.chofer_nombre
                         }}<ProfesoresCant
                             @click="router.get(route('viajes.profesores', { viaje_id: viaje.id }))"
                             :profesores_count="viaje.profesores_count"

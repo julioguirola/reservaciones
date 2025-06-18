@@ -69,27 +69,40 @@ class ProfesoresController extends Controller
       ->join('asignatura', 'profesor.asignatura_id', '=', 'asignatura.id')
       ->where('profesor.deleted_at', null);
 
-    $cant_viajes_filter = $request->query('cant_viajes') + 0;
+    $query_count = DB::table('profesor')
+      ->select('persona.carnet_identidad')
+      ->selectRaw(
+        '(select count(*) from profesor_viaje pv
+        where pv.profesor_id = profesor.id
+        ) as cant_viajes',
+      )
+      ->join('persona', 'profesor.persona_id', '=', 'persona.id')
+      ->where('profesor.deleted_at', null);
 
-    if ($cant_viajes_filter) {
+    $parameters = $request->all();
+
+    if (array_key_exists('cant_viajes', $parameters)) {
+      $cant_viajes_filter = $request->query('cant_viajes');
+      $cv_filter = $cant_viajes_filter + 0;
+      $query = $query->where('cant_viajes', $cv_filter);
+      $query_count = $query_count->where('cant_viajes', $cv_filter);
+    }
+
+    if (array_key_exists('carnet', $parameters)) {
+      $carnet_filter = $request->query('carnet');
+      $query = $query->where('carnet_identidad', 'LIKE', '%' . $carnet_filter . '%');
+      $query_count = $query_count->where('carnet_identidad', 'LIKE', '%' . $carnet_filter . '%');
+    }
+
+    if (array_key_exists('cant_viajes', $parameters) || array_key_exists('carnet', $parameters)) {
+      $count = count($query_count->get()->all());
+      $profesores = $query
+        ->offset($request->query('page', 0) * 5)
+        ->limit(5)
+        ->get();
       return [
-        'profesores' => $query
-          ->where('cant_viajes', $cant_viajes_filter)
-          ->offset($request->query('page', 0) * 5)
-          ->limit(5)
-          ->get(),
-        'profesores_cant' => count(
-          DB::table('profesor')
-            ->selectRaw(
-              '(select count(*) from profesor_viaje pv
-          where pv.profesor_id = profesor.id
-          ) as cant_viajes',
-            )
-            ->where('cant_viajes', $cant_viajes_filter)
-            ->where('profesor.deleted_at', null)
-            ->get()
-            ->all(),
-        ),
+        'profesores' => $profesores,
+        'profesores_cant' => $count,
       ];
     }
 

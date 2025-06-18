@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Errors } from '@/lib/utils';
 import { Plus } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from './InputError.vue';
@@ -99,12 +100,12 @@ const submit = async () => {
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="nombre" class="text-right"> Nombre </Label>
                     <Input id="nombre" v-model="nombre" class="col-span-3" />
-                    <InputError v-if="errors.nombre" :message="errors.nombre[0]" />
+                    <InputError v-if="errors.nombre" :message="Errors[errors.nombre[0]]" class="w-52" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="carnet_identidad" class="text-right"> Carnet de Identidad </Label>
                     <Input id="carnet_identidad" v-model="carnet_identidad" class="col-span-3" />
-                    <InputError v-if="errors.carnet_identidad" :message="errors.carnet_identidad[0]" />
+                    <InputError v-if="errors.carnet_identidad" :message="Errors[errors.carnet_identidad[0]]" class="w-52" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="origen" class="text-right"> Origen</Label>
@@ -121,7 +122,7 @@ const submit = async () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <InputError v-if="errors.destino_id" :message="errors.destino_id[0]" />
+                    <InputError v-if="errors.destino_id" :message="Errors[errors.destino_id[0]]" class="w-52" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="asignatura" class="text-right"> Asignatura</Label>
@@ -138,7 +139,7 @@ const submit = async () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <InputError v-if="errors.asignatura_id" :message="errors.asignatura_id[0]" />
+                    <InputError v-if="errors.asignatura_id" :message="Errors[errors.asignatura_id[0]]" class="w-52" />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="facultad" class="text-right"> Facultad</Label>
@@ -155,7 +156,7 @@ const submit = async () => {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                    <InputError v-if="errors.facultad_id" :message="errors.facultad_id[0]" />
+                    <InputError v-if="errors.facultad_id" :message="Errors[errors.facultad_id[0]]" class="w-52" />
                 </div>
             </div>
             <DialogFooter
