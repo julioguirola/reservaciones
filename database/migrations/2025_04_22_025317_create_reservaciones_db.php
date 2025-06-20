@@ -59,7 +59,6 @@ return new class extends Migration {
       $table->foreign('asignatura_id')->references('id')->on('asignatura');
       $table->unsignedBigInteger('destino_id');
       $table->foreign('destino_id')->references('id')->on('destino');
-      $table->boolean('tarifa');
     });
 
     Schema::create('profesor_viaje', function (Blueprint $table) {

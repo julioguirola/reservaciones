@@ -230,7 +230,6 @@ class ProfesoresController extends Controller
       'destino_id' => $data['destino_id'],
       'asignatura_id' => $data['asignatura_id'],
       'facultad_id' => $data['facultad_id'],
-      'tarifa' => false,
     ]);
 
     return ['profesor' => self::getProfesor($profesor->id)];

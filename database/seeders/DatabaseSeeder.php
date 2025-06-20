@@ -151,17 +151,6 @@ class DatabaseSeeder extends Seeder
       DB::table('profesor_viaje')->insert($inserts);
     });
 
-    Profesor::all()->each(function ($profesor) {
-      $profesor->viajes->each(function ($viaje) use ($profesor) {
-        $fecha = $viaje['fecha'];
-        $mes = explode('-', $fecha)[1];
-        if (!($mes == '08' || $mes == '09')) {
-          DB::table('profesor')
-            ->where('id', $profesor['id'])
-            ->update(['tarifa' => true]);
-        }
-      });
-    });
     // DB::statement('PRAGMA foreign_keys=ON;');
   }
 }

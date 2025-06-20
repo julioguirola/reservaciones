@@ -23,7 +23,6 @@ class ProfesorFactory extends Factory
       'facultad_id' => rand(1, 8),
       'asignatura_id' => rand(1, 12),
       'destino_id' => rand(1, 11),
-      'tarifa' => false,
     ];
   }
 }

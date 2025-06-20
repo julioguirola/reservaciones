@@ -93,14 +93,7 @@ class ViajesController extends Controller
       return ['profesores_not_viaje' => $profesores_not_viaje];
     } else {
       $profesores_viaje = DB::table('profesor_viaje')
-        ->select(
-          'profesor_viaje.profesor_id as id',
-          'persona.id as persona_id',
-          'persona.nombre',
-          'destino.nombre as destino',
-          'destino.precio as tarifa',
-          'profesor.destino_id',
-        )
+        ->select('profesor_viaje.profesor_id as id', 'persona.id as persona_id', 'persona.nombre', 'destino.nombre as destino', 'profesor.destino_id')
         ->where('profesor_viaje.viaje_id', $viaje_id)
         ->join('persona', 'profesor.persona_id', '=', 'persona.id')
         ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
@@ -125,13 +118,22 @@ class ViajesController extends Controller
   public static function getRecaudadoViaje(int $viaje_id)
   {
     return $tarifas_viaje = DB::table('profesor_viaje')
-      ->select('destino.precio')
-      ->join('profesor', 'profesor.id', '=', 'profesor_viaje.profesor_id')
-      ->join('destino', 'profesor.destino_id', '=', 'destino.id')
-      ->join('viaje', 'profesor_viaje.viaje_id', '=', 'viaje.id')
-      ->where('profesor_viaje.viaje_id', $viaje_id)
-      ->where('profesor.tarifa', true)
-      ->sum('destino.precio');
+      ->selectRaw('SUM(d.precio) as recaudado')
+      ->join('profesor as p', 'profesor_viaje.profesor_id', '=', 'p.id')
+      ->join('viaje as v', 'profesor_viaje.viaje_id', '=', 'v.id')
+      ->join('destino as d', 'd.id', '=', 'p.destino_id')
+      ->where('v.id', $viaje_id)
+      ->whereExists(function ($query) {
+        $query
+          ->select(DB::raw(1))
+          ->from('profesor_viaje as pv2')
+          ->join('viaje as v2', 'v2.id', '=', 'pv2.viaje_id')
+          ->whereColumn('pv2.profesor_id', 'p.id')
+          ->whereRaw('DATE(v2.fecha) < DATE(v.fecha)')
+          ->whereNotBetween(DB::raw("CAST(STRFTIME('%m', v2.fecha) AS INTEGER)"), [8, 9])
+          ->limit(1);
+      })
+      ->first()->recaudado;
   }
   public static function addProfesorViaje(int $viaje_id, Request $request)
   {
@@ -145,14 +147,6 @@ class ViajesController extends Controller
         'profesor_id' => $data['profesor_id'],
         'viaje_id' => $viaje_id,
       ]);
-      $viaje = Viaje::find($viaje_id);
-      $fecha = $viaje['fecha'];
-      $mes = explode('-', $fecha)[1];
-      if (!($mes == '08' || $mes == '09')) {
-        DB::table('profesor')
-          ->where('id', $data['profesor_id'])
-          ->update(['tarifa' => true]);
-      }
       return ['succes' => 'Profesor agregado al viaje'];
     } catch (QueryException $e) {
       return response()->json(['error' => 'Error agregando profesor al viaje'], 400);
@@ -169,14 +163,6 @@ class ViajesController extends Controller
     }
     $data = $request->all();
     $deleted = DB::table('profesor_viaje')->where('profesor_id', $data['profesor_id'])->where('viaje_id', $viaje_id)->delete();
-    $viaje = Viaje::find($viaje_id);
-    $fecha = $viaje['fecha'];
-    $mes = explode('-', $fecha)[1];
-    if (!($mes == '08' || $mes == '09')) {
-      DB::table('profesor')
-        ->where('id', $data['profesor_id'])
-        ->update(['tarifa' => false]);
-    }
     if ($deleted) {
       return response()->json(['message' => 'Profesor eliminado del viaje'], 200);
     } else {

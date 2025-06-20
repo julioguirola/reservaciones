@@ -18,8 +18,7 @@ class Profesor extends Model
   use HasFactory, HasUuids, SoftDeletes;
   protected $table = 'profesor';
   public $timestamps = false;
-  public bool $tarifa;
-  protected $fillable = ['persona_id', 'destino_id', 'asignatura_id', 'facultad_id', 'tarifa'];
+  protected $fillable = ['persona_id', 'destino_id', 'asignatura_id', 'facultad_id'];
   /**
    * @return BelongsTo<Persona,Profesor>
    */
